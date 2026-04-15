@@ -1,0 +1,170 @@
+Results-HNF4A-taxa — methods
+============================
+
+Goal
+----
+For a panel of abundant gut taxa (plus Candida albicans as a forced
+inclusion), quantify how well each taxon's abundance tracks three
+features of the host intestinal transcriptome:
+  1. HNF4A transcription-factor activity (via enrichment of the ENCODE
+     HNF4A target gene set among host genes positively correlated with
+     taxon CLR).
+  2. BTNL3 gene expression (direct correlation vs. taxon CLR).
+  3. BTNL8 gene expression (direct correlation vs. taxon CLR).
+
+All analyses use the Kraken Plus PFP (2024-10) reference only and
+are restricted to healthy-donor (HD + nonIBD merged) samples. The
+"HNF4A ENCODE" target gene set is taken from the
+ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X library of the Ma'ayan
+Lab Enrichr resource (https://maayanlab.cloud/Enrichr).
+
+Inputs
+------
+  Data/species_table_clr_202410.tsv   CLR-transformed species table
+                                      (Runs x species, Kraken 2024-10)
+  Data/PRJNA398089_MGX_merged.tsv     Metagenomics run metadata
+  Data/hmp2_metadata_2018-08-20.csv   HMP2 metadata (data_type, week,
+                                      Participant ID, diagnosis)
+  Data/host_tx_counts_filtered.tsv    Host transcriptomics counts
+                                      restricted to known genes
+  Data/ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X.gmt
+                                      Enrichr TF gene-set library
+
+Preprocessing
+-------------
+1. Host transcriptomics (host_week units)
+   - Each External ID is mapped to "ParticipantID__weekNum" via the
+     HMP2 metadata.
+   - Multiple External IDs falling in the same (participant, week) are
+     averaged.
+   - Each row is normalised to relative abundance (row sum = 1) so that
+     gene expression is expressed as a within-sample fraction.
+
+2. Species CLR (host_week units)
+   - CLR values are joined on Run to the metagenomics metadata to get
+     (participant, week, diagnosis) per row; zeros are treated as NaN.
+   - Rows in the same (participant, week) are averaged.
+
+3. Diagnosis harmonisation
+   - "nonIBD" is relabelled "HD".
+   - All subsequent analysis is restricted to diagnosis == "HD".
+
+4. Taxon selection
+   - The top TOP_N species with the highest HD mean CLR are retained.
+   - Candida albicans is force-included (its HD mean-CLR rank is
+     approximately 3,726, well outside the top 100).
+   - Default TOP_N = 100 -> 101-taxon panel.
+
+Window matching
+---------------
+Transcriptomics and metagenomics are collected at different cadences,
+so samples are matched within a participant if their weeks differ by at
+most NUM_WEEKS = 4.  Concretely, for each (participant, week_mgx) row
+in the species table and each (participant, week_tx) row in the
+transcriptomics table, the pair is retained if
+       |week_mgx - week_tx| <= 4
+and then restricted to HD.  All such pairs are used (no deduplication),
+so a single participant can contribute multiple pairs if they have
+multiple nearby visits.  For the top-100 HD-abundance cohort this
+yields ~39-40 paired rows per taxon.
+
+Per-taxon correlations (vectorised)
+-----------------------------------
+For a given taxon T, let y be the length-n vector of CLR values for T
+across the n window-matched HD host-week pairs, and X be the
+corresponding (n x n_genes) matrix of host-gene relative-abundance
+values.  For every host gene j:
+     r_j = Pearson(y, X[:, j])
+     t_j = r_j * sqrt((n-2) / (1 - r_j^2))
+     p_j = 2 * P(T > |t_j|)        (two-sided, scipy.stats.t)
+All r_j, p_j are computed in a single numpy matmul per taxon rather
+than one scipy.linregress call per gene.
+
+BTNL3 and BTNL8 p-values are read directly out of (r_j, p_j) for the
+corresponding columns.
+
+HNF4A enrichment
+----------------
+1. Query genes: host genes with p_j < 0.05 AND r_j > 0 (i.e. positively
+   correlated with the taxon's CLR at uncorrected p < 0.05).
+2. Background: the full set of filtered host genes
+   (33,052 genes from host_tx_counts_filtered.tsv).
+3. Target gene set: "HNF4A ENCODE" from the Enrichr
+   ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X library, restricted to
+   genes present in the background.
+4. Fisher's exact test (one-sided, "greater") on the 2x2
+        a = |query & HNF4A_gs|            b = |query| - a
+        c = |HNF4A_gs| - a                d = N - a - b - c
+   where N = |background|.
+   The reported HNF4A_pval / HNF4A_odds_ratio / HNF4A_overlap come
+   from this single test.
+   If the taxon has < 5 positively correlated genes, HNF4A_pval is
+   left as NaN.
+
+Combined ranking
+----------------
+The three p-values HNF4A_pval, BTNL3_pval, BTNL8_pval are combined
+taxon-by-taxon via a geometric mean:
+     combined_pval_geomean = exp( mean( log(p_i) ) )
+To avoid -inf from underflow, each p is clipped to a floor of 1e-300
+before taking the log.
+
+Taxa are ranked ascending by combined_pval_geomean.
+
+Capped ranking (top100_capped1e-10)
+-----------------------------------
+The raw combined ranking is dominated by taxa whose HNF4A Fisher
+p-value is astronomically small (e.g. 1e-50), because log(1e-50)
+contributes -115 to the geometric mean while BTNL signals contribute
+at most ~-10.  To prevent a single extreme p from dominating, we
+additionally compute the combined score after capping every input
+p-value at a floor of 1e-10:
+     p_capped = max(p, 1e-10)
+     combined_capped = exp( mean( log(p_capped) ) )
+This makes taxa comparable on an equal footing once any signal is
+"clearly significant", and foregrounds taxa whose three signals are
+jointly strong and directionally consistent rather than taxa with a
+single enormous HNF4A hit.
+
+Files in this folder
+--------------------
+  hnf4a_btnl_taxa_ranking_top100.tsv
+      Top-100 HD-abundance taxa + Candida albicans.  Columns:
+      Taxon, n_samples, n_query, HNF4A_pval, HNF4A_odds_ratio,
+      HNF4A_overlap, BTNL3_r, BTNL3_pval, BTNL8_r, BTNL8_pval,
+      mean_clr, combined_pval_geomean, neg_log10_combined,
+      combined_pval_geomean_capped, neg_log10_combined_capped.
+      Sorted by combined_pval_geomean (uncapped).
+
+  hnf4a_btnl_taxa_ranking_top100_plot.png / .pdf
+      Horizontal bar plot of -log10(combined_pval_geomean) for all
+      101 taxa, Candida albicans highlighted in red, dashed line at
+      p = 0.05.  (Uncapped.)
+
+  hnf4a_btnl_taxa_ranking_top100_capped1e-10.tsv
+      Same columns, sorted by combined_pval_geomean_capped.
+
+  hnf4a_btnl_taxa_ranking_top100_capped1e-10_plot.png / .pdf
+      Horizontal bar plot of -log10(combined_pval_geomean_capped),
+      Candida in red, dashed line at p = 0.05.
+
+  methods.txt
+      This file.
+
+Key parameters
+--------------
+  NUM_WEEKS        = 4
+  DIAGNOSIS        = "HD" (nonIBD merged into HD)
+  CORR_P_THRESHOLD = 0.05   (for selecting HNF4A query genes)
+  TF_OF_INTEREST   = "HNF4A ENCODE"
+  BTNL_GENES       = BTNL3, BTNL8
+  TOP_N            = 100    (by HD mean CLR) + forced Candida albicans
+  P-value cap      = 1e-10  (capped ranking only)
+  Reference        = Kraken Plus PFP (2024-10)
+  Enrichr library  = ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X
+                     (Ma'ayan Lab, https://maayanlab.cloud/Enrichr)
+
+Generating script
+-----------------
+  hnf4a_btnl_taxa_ranking.py    (in Manuscript_Candida_Albicans/)
+  Uncapped and capped outputs are produced in the same run.

@@ -1,0 +1,566 @@
+=== Candida-Kraken pipeline (Kraken 2024-10) ===
+Date:        Wed Apr 15 22:15:43 IDT 2026
+Window:      +-4 weeks
+Target:      S__Candida albicans
+Diagnoses:   HD CD UC
+
+[Step 1] Filtering transcriptomics to known genes ...
+Reading Data/host_tx_counts.tsv ...
+  55765 genes, 254 samples
+  47013 unique gene names after version trimming
+
+Querying mygene.info in 48 batches ...
+  batch 1/48  (1000 genes) ... OK 145 matched (114 protein-coding)
+  batch 2/48  (1000 genes) ... FAILED
+  batch 3/48  (1000 genes) ... FAILED
+  batch 4/48  (1000 genes) ... OK 514 matched (391 protein-coding)
+  batch 5/48  (1000 genes) ... OK 349 matched (260 protein-coding)
+  batch 6/48  (1000 genes) ... OK 983 matched (754 protein-coding)
+  batch 7/48  (1000 genes) ... OK 970 matched (733 protein-coding)
+  batch 8/48  (1000 genes) ... OK 999 matched (802 protein-coding)
+  batch 9/48  (1000 genes) ... OK 961 matched (756 protein-coding)
+  batch 10/48  (1000 genes) ... OK 34 matched (16 protein-coding)
+  batch 11/48  (1000 genes) ... OK 829 matched (626 protein-coding)
+  batch 12/48  (1000 genes) ... OK 999 matched (675 protein-coding)
+  batch 13/48  (1000 genes) ... OK 995 matched (737 protein-coding)
+  batch 14/48  (1000 genes) ... OK 984 matched (731 protein-coding)
+  batch 15/48  (1000 genes) ... OK 947 matched (662 protein-coding)
+  batch 16/48  (1000 genes) ... OK 997 matched (393 protein-coding)
+  batch 17/48  (1000 genes) ... OK 946 matched (685 protein-coding)
+  batch 18/48  (1000 genes) ... OK 958 matched (572 protein-coding)
+  batch 19/48  (1000 genes) ... OK 944 matched (491 protein-coding)
+  batch 20/48  (1000 genes) ... OK 984 matched (360 protein-coding)
+  batch 21/48  (1000 genes) ... OK 989 matched (113 protein-coding)
+  batch 22/48  (1000 genes) ... OK 1000 matched (586 protein-coding)
+  batch 23/48  (1000 genes) ... OK 997 matched (743 protein-coding)
+  batch 24/48  (1000 genes) ... OK 1000 matched (523 protein-coding)
+  batch 25/48  (1000 genes) ... OK 998 matched (788 protein-coding)
+  batch 26/48  (1000 genes) ... OK 993 matched (735 protein-coding)
+  batch 27/48  (1000 genes) ... OK 994 matched (623 protein-coding)
+  batch 28/48  (1000 genes) ... OK 826 matched (0 protein-coding)
+  batch 29/48  (1000 genes) ... OK 991 matched (116 protein-coding)
+  batch 30/48  (1000 genes) ... OK 967 matched (0 protein-coding)
+  batch 31/48  (1000 genes) ... OK 589 matched (19 protein-coding)
+  batch 32/48  (1000 genes) ... OK 1 matched (1 protein-coding)
+  batch 33/48  (1000 genes) ... FAILED
+  batch 34/48  (1000 genes) ... OK 1 matched (1 protein-coding)
+  batch 35/48  (1000 genes) ... FAILED
+  batch 36/48  (1000 genes) ... FAILED
+  batch 37/48  (1000 genes) ... FAILED
+  batch 38/48  (1000 genes) ... OK 3 matched (3 protein-coding)
+  batch 39/48  (1000 genes) ... OK 342 matched (52 protein-coding)
+  batch 40/48  (1000 genes) ... OK 996 matched (361 protein-coding)
+  batch 41/48  (1000 genes) ... OK 999 matched (806 protein-coding)
+  batch 42/48  (1000 genes) ... OK 976 matched (451 protein-coding)
+  batch 43/48  (1000 genes) ... OK 999 matched (743 protein-coding)
+  batch 44/48  (1000 genes) ... OK 1000 matched (779 protein-coding)
+  batch 45/48  (1000 genes) ... OK 983 matched (553 protein-coding)
+  batch 46/48  (1000 genes) ... OK 908 matched (612 protein-coding)
+  batch 47/48  (1000 genes) ... OK 960 matched (792 protein-coding)
+  batch 48/48  (13 genes) ... FAILED
+
+Matched genes by type:
+  protein-coding                 : 19158
+  pseudo                         : 6354
+  unknown                        : 3926
+  ncRNA                          : 2858
+  snoRNA                         : 347
+  other                          : 315
+  snRNA                          : 46
+  tRNA                           : 24
+  rRNA                           : 19
+  scRNA                          : 3
+
+Annotation table (33052 genes) -> Data/gene_annotations.tsv
+Kept 33052 / 55765 genes (all matched)
+Filtered counts -> Data/host_tx_counts_filtered.tsv
+
+Done.
+
+[Step 2] Correlating Candida CLR with gene expression ...
+=== Candida-gene correlation (Kraken 2024-10) ===
+CLR table:    Data/species_table_clr_202410.tsv
+TX counts:    Data/host_tx_counts_filtered.tsv
+Window:       +-4 weeks
+Match mode:   all within window
+Diagnoses:    HD, CD, UC
+Output dir:   Results/
+
+Building host transcriptomics table ...
+  100 host-week rows, 33052 genes -> Results/Tables/merged_host_transcriptomic_data.tsv
+Extracting Candida CLR ...
+  1295 host-weeks with Candida data -> Results/Tables/candida_clr_withdiagnosis.tsv
+
+--- HD (355 host-weeks) ---
+    Exact match: 7 samples -> Results/HD/Tables/candida_gene_correlations_exact.tsv
+    +-4w: 40 matched pairs
+  linregress (HD):   0%|          | 0/33053 [00:00<?, ?it/s]  linregress (HD):   1%|▏         | 475/33053 [00:00<00:06, 4741.99it/s]  linregress (HD):   3%|▎         | 962/33053 [00:00<00:06, 4816.42it/s]  linregress (HD):   4%|▍         | 1444/33053 [00:00<00:07, 4445.12it/s]  linregress (HD):   6%|▌         | 1921/33053 [00:00<00:06, 4564.23it/s]  linregress (HD):   7%|▋         | 2431/33053 [00:00<00:06, 4750.83it/s]  linregress (HD):   9%|▉         | 2936/33053 [00:00<00:06, 4849.14it/s]  linregress (HD):  10%|█         | 3436/33053 [00:00<00:06, 4897.06it/s]  linregress (HD):  12%|█▏        | 3927/33053 [00:00<00:06, 4498.74it/s]  linregress (HD):  13%|█▎        | 4391/33053 [00:00<00:06, 4538.98it/s]  linregress (HD):  15%|█▍        | 4850/33053 [00:01<00:06, 4474.12it/s]  linregress (HD):  16%|█▌        | 5315/33053 [00:01<00:06, 4523.41it/s]  linregress (HD):  18%|█▊        | 5795/33053 [00:01<00:05, 4602.81it/s]  linregress (HD):  19%|█▉        | 6260/33053 [00:01<00:05, 4612.78it/s]  linregress (HD):  20%|██        | 6762/33053 [00:01<00:05, 4731.68it/s]  linregress (HD):  22%|██▏       | 7305/33053 [00:01<00:05, 4939.55it/s]  linregress (HD):  24%|██▎       | 7809/33053 [00:01<00:05, 4968.05it/s]  linregress (HD):  25%|██▌       | 8354/33053 [00:01<00:04, 5111.35it/s]  linregress (HD):  27%|██▋       | 8884/33053 [00:01<00:04, 5166.65it/s]  linregress (HD):  28%|██▊       | 9402/33053 [00:01<00:04, 5095.73it/s]  linregress (HD):  30%|██▉       | 9913/33053 [00:03<00:24, 948.21it/s]   linregress (HD):  31%|███▏      | 10385/33053 [00:03<00:18, 1223.49it/s]  linregress (HD):  33%|███▎      | 10860/33053 [00:03<00:14, 1555.91it/s]  linregress (HD):  34%|███▍      | 11281/33053 [00:06<00:46, 472.07it/s]   linregress (HD):  36%|███▌      | 11754/33053 [00:06<00:32, 646.89it/s]  linregress (HD):  37%|███▋      | 12240/33053 [00:06<00:23, 880.26it/s]  linregress (HD):  38%|███▊      | 12682/33053 [00:06<00:17, 1139.76it/s]  linregress (HD):  40%|███▉      | 13157/33053 [00:06<00:13, 1481.89it/s]  linregress (HD):  41%|████      | 13584/33053 [00:06<00:11, 1717.15it/s]  linregress (HD):  43%|████▎     | 14092/33053 [00:06<00:08, 2183.83it/s]  linregress (HD):  44%|████▍     | 14695/33053 [00:07<00:06, 2819.99it/s]  linregress (HD):  46%|████▋     | 15322/33053 [00:07<00:05, 3478.67it/s]  linregress (HD):  48%|████▊     | 15844/33053 [00:07<00:04, 3845.24it/s]  linregress (HD):  50%|████▉     | 16365/33053 [00:07<00:04, 4151.85it/s]  linregress (HD):  51%|█████     | 16884/33053 [00:07<00:03, 4289.41it/s]  linregress (HD):  53%|█████▎    | 17387/33053 [00:07<00:04, 3494.99it/s]  linregress (HD):  54%|█████▍    | 17811/33053 [00:07<00:04, 3658.56it/s]  linregress (HD):  55%|█████▌    | 18288/33053 [00:07<00:03, 3926.64it/s]  linregress (HD):  57%|█████▋    | 18765/33053 [00:08<00:03, 4140.56it/s]  linregress (HD):  58%|█████▊    | 19216/33053 [00:08<00:03, 3887.53it/s]  linregress (HD):  59%|█████▉    | 19633/33053 [00:08<00:03, 3636.33it/s]  linregress (HD):  61%|██████    | 20147/33053 [00:08<00:03, 4017.67it/s]  linregress (HD):  62%|██████▏   | 20646/33053 [00:08<00:02, 4275.27it/s]  linregress (HD):  64%|██████▍   | 21113/33053 [00:08<00:03, 3452.66it/s]  linregress (HD):  65%|██████▌   | 21591/33053 [00:08<00:03, 3766.43it/s]  linregress (HD):  67%|██████▋   | 22101/33053 [00:08<00:02, 4102.58it/s]  linregress (HD):  69%|██████▊   | 22719/33053 [00:08<00:02, 4652.97it/s]  linregress (HD):  70%|███████   | 23296/33053 [00:09<00:01, 4958.68it/s]  linregress (HD):  72%|███████▏  | 23928/33053 [00:09<00:01, 5341.68it/s]  linregress (HD):  74%|███████▍  | 24565/33053 [00:09<00:01, 5635.12it/s]  linregress (HD):  76%|███████▌  | 25143/33053 [00:09<00:01, 5647.04it/s]  linregress (HD):  78%|███████▊  | 25718/33053 [00:09<00:01, 5492.67it/s]  linregress (HD):  79%|███████▉  | 26275/33053 [00:09<00:01, 5199.13it/s]  linregress (HD):  81%|████████  | 26803/33053 [00:09<00:01, 4836.48it/s]  linregress (HD):  83%|████████▎ | 27296/33053 [00:09<00:01, 4533.16it/s]  linregress (HD):  84%|████████▍ | 27758/33053 [00:10<00:01, 3720.75it/s]  linregress (HD):  85%|████████▌ | 28186/33053 [00:10<00:01, 3849.69it/s]  linregress (HD):  87%|████████▋ | 28596/33053 [00:10<00:01, 3910.88it/s]  linregress (HD):  88%|████████▊ | 29023/33053 [00:10<00:01, 4004.51it/s]  linregress (HD):  89%|████████▉ | 29464/33053 [00:10<00:01, 3160.57it/s]  linregress (HD):  90%|█████████ | 29817/33053 [00:11<00:02, 1135.72it/s]  linregress (HD):  91%|█████████ | 30076/33053 [00:11<00:02, 1084.82it/s]  linregress (HD):  92%|█████████▏| 30573/33053 [00:11<00:01, 1515.74it/s]  linregress (HD):  93%|█████████▎| 30881/33053 [00:11<00:01, 1729.49it/s]  linregress (HD):  95%|█████████▍| 31366/33053 [00:12<00:00, 2239.10it/s]  linregress (HD):  96%|█████████▋| 31863/33053 [00:12<00:00, 2755.21it/s]  linregress (HD):  98%|█████████▊| 32268/33053 [00:12<00:00, 3030.17it/s]  linregress (HD):  99%|█████████▉| 32752/33053 [00:12<00:00, 3451.50it/s]  linregress (HD): 100%|██████████| 33053/33053 [00:12<00:00, 2665.53it/s]
+    Top 10 correlated genes (HD, +-4w):
+       Gene  Correlation         Slope  P_value  N
+      RIOK3     0.600315  1.281120e+04 0.000053 39
+    GALNT18    -0.576526 -4.823085e+05 0.000122 39
+     ELK2BP     0.575629  8.616700e+07 0.000126 39
+    TRBV7-3    -0.564220 -6.524005e+05 0.000183 39
+ANKRD44-IT1    -0.563960 -1.221537e+07 0.000185 39
+   ANTXRLP1    -0.563942 -1.694123e+06 0.000185 39
+     TRAV34    -0.559036 -7.801472e+06 0.000216 39
+     IGSF9B    -0.557920 -2.134485e+06 0.000224 39
+      TCL1B    -0.549737 -1.760716e+07 0.000289 39
+      ATOH1     0.546245  7.851215e+04 0.000321 39
+    All results -> Results/HD/Tables/candida_gene_correlations_pm4_weeks_with_p-values.tsv
+
+--- CD (581 host-weeks) ---
+    Exact match: 9 samples -> Results/CD/Tables/candida_gene_correlations_exact.tsv
+    +-4w: 62 matched pairs
+  linregress (CD):   0%|          | 0/33053 [00:00<?, ?it/s]  linregress (CD):   2%|▏         | 503/33053 [00:00<00:06, 5029.90it/s]  linregress (CD):   3%|▎         | 1009/33053 [00:00<00:06, 5045.91it/s]  linregress (CD):   5%|▍         | 1514/33053 [00:00<00:06, 4992.21it/s]  linregress (CD):   6%|▌         | 2014/33053 [00:00<00:07, 4342.96it/s]  linregress (CD):   7%|▋         | 2459/33053 [00:00<00:07, 3891.54it/s]  linregress (CD):   9%|▊         | 2860/33053 [00:00<00:07, 3917.96it/s]  linregress (CD):  10%|█         | 3330/33053 [00:00<00:07, 4145.34it/s]  linregress (CD):  11%|█▏        | 3793/33053 [00:00<00:06, 4288.41it/s]  linregress (CD):  13%|█▎        | 4277/33053 [00:00<00:06, 4446.52it/s]  linregress (CD):  14%|█▍        | 4770/33053 [00:01<00:06, 4587.65it/s]  linregress (CD):  16%|█▌        | 5270/33053 [00:01<00:05, 4708.65it/s]  linregress (CD):  17%|█▋        | 5759/33053 [00:01<00:05, 4761.89it/s]  linregress (CD):  19%|█▉        | 6238/33053 [00:01<00:05, 4758.11it/s]  linregress (CD):  20%|██        | 6734/33053 [00:01<00:05, 4817.21it/s]  linregress (CD):  22%|██▏       | 7222/33053 [00:01<00:05, 4833.02it/s]  linregress (CD):  23%|██▎       | 7709/33053 [00:01<00:05, 4841.59it/s]  linregress (CD):  25%|██▍       | 8210/33053 [00:01<00:05, 4890.98it/s]  linregress (CD):  26%|██▋       | 8700/33053 [00:01<00:04, 4886.72it/s]  linregress (CD):  28%|██▊       | 9189/33053 [00:01<00:04, 4883.68it/s]  linregress (CD):  29%|██▉       | 9678/33053 [00:02<00:04, 4841.81it/s]  linregress (CD):  31%|███       | 10163/33053 [00:02<00:07, 2999.93it/s]  linregress (CD):  32%|███▏      | 10651/33053 [00:02<00:06, 3391.77it/s]  linregress (CD):  33%|███▎      | 11068/33053 [00:04<00:38, 565.79it/s]   linregress (CD):  35%|███▍      | 11510/33053 [00:05<00:28, 756.08it/s]  linregress (CD):  36%|███▋      | 11992/33053 [00:05<00:20, 1023.74it/s]  linregress (CD):  37%|███▋      | 12375/33053 [00:05<00:17, 1153.97it/s]  linregress (CD):  39%|███▉      | 12873/33053 [00:05<00:13, 1539.46it/s]  linregress (CD):  40%|████      | 13358/33053 [00:05<00:10, 1955.97it/s]  linregress (CD):  42%|████▏     | 13841/33053 [00:05<00:08, 2392.50it/s]  linregress (CD):  43%|████▎     | 14322/33053 [00:05<00:06, 2823.55it/s]  linregress (CD):  45%|████▌     | 14894/33053 [00:05<00:05, 3411.68it/s]  linregress (CD):  47%|████▋     | 15416/33053 [00:05<00:04, 3818.22it/s]  linregress (CD):  48%|████▊     | 15911/33053 [00:06<00:04, 3981.77it/s]  linregress (CD):  50%|████▉     | 16391/33053 [00:06<00:04, 4149.31it/s]  linregress (CD):  51%|█████     | 16882/33053 [00:06<00:03, 4349.24it/s]  linregress (CD):  53%|█████▎    | 17362/33053 [00:06<00:04, 3528.89it/s]  linregress (CD):  54%|█████▍    | 17826/33053 [00:06<00:04, 3789.55it/s]  linregress (CD):  55%|█████▌    | 18302/33053 [00:06<00:03, 4032.78it/s]  linregress (CD):  57%|█████▋    | 18743/33053 [00:06<00:03, 3664.74it/s]  linregress (CD):  58%|█████▊    | 19236/33053 [00:06<00:03, 3980.64it/s]  linregress (CD):  60%|█████▉    | 19714/33053 [00:06<00:03, 4190.20it/s]  linregress (CD):  61%|██████    | 20194/33053 [00:07<00:02, 4356.67it/s]  linregress (CD):  63%|██████▎   | 20670/33053 [00:07<00:02, 4469.10it/s]  linregress (CD):  64%|██████▍   | 21130/33053 [00:07<00:03, 3556.43it/s]  linregress (CD):  65%|██████▌   | 21524/33053 [00:07<00:03, 3583.33it/s]  linregress (CD):  66%|██████▋   | 21950/33053 [00:07<00:02, 3751.95it/s]  linregress (CD):  68%|██████▊   | 22417/33053 [00:07<00:02, 3996.65it/s]  linregress (CD):  69%|██████▉   | 22920/33053 [00:07<00:02, 4280.28it/s]  linregress (CD):  71%|███████   | 23438/33053 [00:07<00:02, 4534.20it/s]  linregress (CD):  73%|███████▎  | 23995/33053 [00:07<00:01, 4829.94it/s]  linregress (CD):  74%|███████▍  | 24545/33053 [00:08<00:01, 5024.04it/s]  linregress (CD):  76%|███████▌  | 25055/33053 [00:08<00:01, 4992.14it/s]  linregress (CD):  77%|███████▋  | 25560/33053 [00:08<00:01, 4626.71it/s]  linregress (CD):  79%|███████▉  | 26032/33053 [00:08<00:01, 4443.24it/s]  linregress (CD):  80%|████████  | 26484/33053 [00:08<00:01, 3609.78it/s]  linregress (CD):  81%|████████▏ | 26917/33053 [00:08<00:01, 3783.67it/s]  linregress (CD):  83%|████████▎ | 27347/33053 [00:08<00:01, 3913.89it/s]  linregress (CD):  84%|████████▍ | 27861/33053 [00:08<00:01, 4239.49it/s]  linregress (CD):  86%|████████▌ | 28321/33053 [00:09<00:01, 4338.65it/s]  linregress (CD):  87%|████████▋ | 28795/33053 [00:09<00:00, 4451.80it/s]  linregress (CD):  89%|████████▊ | 29261/33053 [00:09<00:00, 4509.17it/s]  linregress (CD):  90%|████████▉ | 29719/33053 [00:10<00:02, 1132.16it/s]  linregress (CD):  91%|█████████ | 30052/33053 [00:10<00:02, 1061.52it/s]  linregress (CD):  92%|█████████▏| 30483/33053 [00:10<00:01, 1374.27it/s]  linregress (CD):  94%|█████████▎| 30919/33053 [00:10<00:01, 1735.37it/s]  linregress (CD):  95%|█████████▍| 31354/33053 [00:11<00:00, 2120.22it/s]  linregress (CD):  96%|█████████▋| 31816/33053 [00:11<00:00, 2554.72it/s]  linregress (CD):  98%|█████████▊| 32241/33053 [00:11<00:00, 2891.62it/s]  linregress (CD):  99%|█████████▉| 32689/33053 [00:11<00:00, 3243.11it/s]  linregress (CD): 100%|██████████| 33053/33053 [00:11<00:00, 2897.28it/s]
+    Top 10 correlated genes (CD, +-4w):
+       Gene  Correlation        Slope  P_value  N
+      RFKP1     0.554990 7.882438e+07 0.000029 50
+ RNU6-1329P     0.538608 1.065908e+08 0.000055 50
+     TXNDC8     0.533770 7.569049e+07 0.000066 50
+IGLVIV-66-1     0.516968 1.293036e+08 0.000121 50
+     OR4F15     0.516855 1.249813e+08 0.000122 50
+     MBD3L1     0.515764 8.132259e+07 0.000126 50
+  LINC00534     0.509377 9.810073e+07 0.000158 50
+ CCDC13-AS1     0.508926 5.712736e+07 0.000161 50
+     FOXO3B     0.503131 1.851477e+06 0.000196 50
+RNU6ATAC24P     0.495952 1.931321e+07 0.000250 50
+    All results -> Results/CD/Tables/candida_gene_correlations_pm4_weeks_with_p-values.tsv
+
+--- UC (359 host-weeks) ---
+    Exact match: 3 samples -> Results/UC/Tables/candida_gene_correlations_exact.tsv
+    +-4w: 33 matched pairs
+  linregress (UC):   0%|          | 0/33053 [00:00<?, ?it/s]  linregress (UC):   1%|▏         | 488/33053 [00:00<00:06, 4878.34it/s]  linregress (UC):   3%|▎         | 977/33053 [00:00<00:06, 4883.30it/s]  linregress (UC):   4%|▍         | 1466/33053 [00:00<00:06, 4829.13it/s]  linregress (UC):   6%|▌         | 1958/33053 [00:00<00:06, 4864.31it/s]  linregress (UC):   7%|▋         | 2451/33053 [00:00<00:06, 4886.94it/s]  linregress (UC):   9%|▉         | 2940/33053 [00:00<00:06, 4878.39it/s]  linregress (UC):  10%|█         | 3439/33053 [00:00<00:06, 4913.21it/s]  linregress (UC):  12%|█▏        | 3931/33053 [00:00<00:05, 4867.87it/s]  linregress (UC):  13%|█▎        | 4418/33053 [00:00<00:05, 4811.89it/s]  linregress (UC):  15%|█▍        | 4900/33053 [00:01<00:05, 4719.40it/s]  linregress (UC):  16%|█▋        | 5375/33053 [00:01<00:05, 4726.77it/s]  linregress (UC):  18%|█▊        | 5848/33053 [00:01<00:05, 4713.79it/s]  linregress (UC):  19%|█▉        | 6331/33053 [00:01<00:05, 4747.72it/s]  linregress (UC):  21%|██        | 6806/33053 [00:01<00:05, 4713.61it/s]  linregress (UC):  22%|██▏       | 7285/33053 [00:01<00:05, 4734.79it/s]  linregress (UC):  23%|██▎       | 7759/33053 [00:01<00:05, 4617.65it/s]  linregress (UC):  25%|██▍       | 8222/33053 [00:01<00:05, 4605.94it/s]  linregress (UC):  26%|██▋       | 8711/33053 [00:01<00:05, 4688.89it/s]  linregress (UC):  28%|██▊       | 9193/33053 [00:01<00:05, 4725.42it/s]  linregress (UC):  29%|██▉       | 9676/33053 [00:02<00:04, 4755.39it/s]  linregress (UC):  31%|███       | 10152/33053 [00:02<00:08, 2743.99it/s]  linregress (UC):  32%|███▏      | 10527/33053 [00:02<00:08, 2720.33it/s]  linregress (UC):  33%|███▎      | 10890/33053 [00:02<00:08, 2507.22it/s]  linregress (UC):  34%|███▍      | 11191/33053 [00:05<00:51, 423.96it/s]   linregress (UC):  35%|███▍      | 11405/33053 [00:05<00:43, 496.03it/s]  linregress (UC):  36%|███▌      | 11822/33053 [00:05<00:29, 715.68it/s]  linregress (UC):  37%|███▋      | 12255/33053 [00:05<00:20, 999.91it/s]  linregress (UC):  38%|███▊      | 12642/33053 [00:05<00:15, 1289.70it/s]  linregress (UC):  40%|███▉      | 13061/33053 [00:05<00:12, 1655.41it/s]  linregress (UC):  41%|████      | 13511/33053 [00:05<00:09, 2088.82it/s]  linregress (UC):  42%|████▏     | 13987/33053 [00:06<00:07, 2566.88it/s]  linregress (UC):  44%|████▍     | 14512/33053 [00:06<00:05, 3112.73it/s]  linregress (UC):  46%|████▌     | 15133/33053 [00:06<00:04, 3808.36it/s]  linregress (UC):  47%|████▋     | 15654/33053 [00:06<00:04, 4147.25it/s]  linregress (UC):  49%|████▉     | 16166/33053 [00:06<00:03, 4398.09it/s]  linregress (UC):  50%|█████     | 16674/33053 [00:06<00:03, 4507.88it/s]  linregress (UC):  52%|█████▏    | 17173/33053 [00:06<00:04, 3614.18it/s]  linregress (UC):  53%|█████▎    | 17596/33053 [00:06<00:04, 3255.86it/s]  linregress (UC):  55%|█████▍    | 18098/33053 [00:07<00:04, 3651.83it/s]  linregress (UC):  56%|█████▌    | 18578/33053 [00:07<00:03, 3927.43it/s]  linregress (UC):  58%|█████▊    | 19056/33053 [00:07<00:03, 4145.23it/s]  linregress (UC):  59%|█████▉    | 19539/33053 [00:07<00:03, 4328.37it/s]  linregress (UC):  61%|██████    | 20003/33053 [00:07<00:02, 4412.43it/s]  linregress (UC):  62%|██████▏   | 20496/33053 [00:07<00:02, 4556.92it/s]  linregress (UC):  64%|██████▎   | 21057/33053 [00:07<00:02, 4859.99it/s]  linregress (UC):  65%|██████▌   | 21554/33053 [00:07<00:02, 4179.32it/s]  linregress (UC):  67%|██████▋   | 22173/33053 [00:07<00:02, 4706.66it/s]  linregress (UC):  69%|██████▉   | 22869/33053 [00:07<00:01, 5320.56it/s]  linregress (UC):  71%|███████   | 23491/33053 [00:08<00:01, 5570.79it/s]  linregress (UC):  73%|███████▎  | 24233/33053 [00:08<00:01, 6098.68it/s]  linregress (UC):  75%|███████▌  | 24877/33053 [00:08<00:01, 5326.49it/s]  linregress (UC):  77%|███████▋  | 25438/33053 [00:08<00:01, 5261.15it/s]  linregress (UC):  79%|███████▊  | 25984/33053 [00:08<00:01, 5207.59it/s]  linregress (UC):  80%|████████  | 26518/33053 [00:08<00:01, 5144.85it/s]  linregress (UC):  82%|████████▏ | 27042/33053 [00:08<00:01, 4981.56it/s]  linregress (UC):  83%|████████▎ | 27547/33053 [00:08<00:01, 4869.62it/s]  linregress (UC):  85%|████████▍ | 28074/33053 [00:09<00:01, 4978.48it/s]  linregress (UC):  86%|████████▋ | 28576/33053 [00:09<00:00, 4891.53it/s]  linregress (UC):  88%|████████▊ | 29071/33053 [00:09<00:00, 4906.49it/s]  linregress (UC):  89%|████████▉ | 29564/33053 [00:10<00:02, 1356.91it/s]  linregress (UC):  91%|█████████ | 29924/33053 [00:10<00:02, 1260.98it/s]  linregress (UC):  92%|█████████▏| 30378/33053 [00:10<00:01, 1601.99it/s]  linregress (UC):  93%|█████████▎| 30837/33053 [00:10<00:01, 1988.41it/s]  linregress (UC):  95%|█████████▍| 31313/33053 [00:10<00:00, 2420.61it/s]  linregress (UC):  96%|█████████▌| 31811/33053 [00:10<00:00, 2886.57it/s]  linregress (UC):  98%|█████████▊| 32243/33053 [00:11<00:00, 2800.02it/s]  linregress (UC):  99%|█████████▉| 32757/33053 [00:11<00:00, 3281.39it/s]  linregress (UC): 100%|██████████| 33053/33053 [00:11<00:00, 2927.27it/s]
+    Top 10 correlated genes (UC, +-4w):
+          Gene  Correlation         Slope  P_value  N
+       SRSF9P1     0.614541  7.609134e+07 0.000648 27
+          IRGC     0.612920  8.032323e+07 0.000676 27
+     HNRNPA1L2     0.606596  6.737242e+05 0.000796 27
+          IRGM     0.600810  1.419583e+07 0.000920 27
+       PHKA1P1    -0.600561 -4.970902e+06 0.000926 27
+      C19orf12     0.598891  2.510446e+05 0.000965 27
+          DGKB     0.598377  1.447042e+07 0.000977 27
+     C10orf107     0.596252  4.287249e+06 0.001030 27
+         MEF2B     0.591538  1.558882e+07 0.001155 27
+ARHGAP19-SLIT1     0.591060  3.722191e+07 0.001168 27
+    All results -> Results/UC/Tables/candida_gene_correlations_pm4_weeks_with_p-values.tsv
+
+Done.
+
+[Step 3] TF enrichment (positive correlation, ENCODE/ChEA) ...
+  --- HD ---
+Loading library: ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X ...
+  GMT already cached: Data/ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X.gmt
+  104 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[HD] 778 query genes (p<0.05, corr pos)
+  2 terms significant (adj. p < 0.05)
+        Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+HNF4A ENCODE 2.121596e-09      2.206460e-07    2.423750       17.680734
+ ZEB1 ENCODE 4.785445e-04      2.488432e-02    4.280559       11.116122
+  Results -> Results/HD/Tables/enrichr_ENCODE_ChEA_TFs_pm4_weeks.tsv
+
+Done.
+  --- CD ---
+Loading library: ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X ...
+  GMT already cached: Data/ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X.gmt
+  104 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[CD] 1737 query genes (p<0.05, corr pos)
+  35 terms significant (adj. p < 0.05)
+         Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+  UBTF ENCODE 3.358027e-22      3.492348e-20    2.411562       43.525631
+   YY1 ENCODE 6.696191e-14      3.482019e-12    1.801192       17.850385
+  TAF1 ENCODE 1.294165e-10      4.486439e-09    1.608687       10.824323
+  RELA ENCODE 4.708115e-09      1.224110e-07    2.555303       17.988465
+  TCF3 ENCODE 1.651889e-07      3.435930e-06    1.959541       10.505159
+    SPI1 CHEA 2.894448e-07      5.017043e-06    1.826706        9.071039
+  ELF1 ENCODE 5.031294e-07      7.475065e-06    1.528937        6.157333
+  ATF2 ENCODE 8.844223e-07      1.149749e-05    1.482233        5.485425
+  CHD1 ENCODE 2.228719e-06      2.394033e-05    1.976932        8.869700
+  USF1 ENCODE 2.301955e-06      2.394033e-05    1.652942        6.524066
+  SPI1 ENCODE 2.551673e-06      2.412491e-05    1.619940        6.212572
+ CREB1 ENCODE 2.821510e-06      2.445309e-05    1.512138        5.284117
+ BRCA1 ENCODE 3.507205e-06      2.805764e-05    1.424972        4.448397
+ZNF384 ENCODE 2.525950e-05      1.876420e-04    1.794542        6.190343
+ STAT3 ENCODE 2.937277e-05      2.036512e-04    1.811665        6.201224
+  Results -> Results/CD/Tables/enrichr_ENCODE_ChEA_TFs_pm4_weeks.tsv
+
+Done.
+  --- UC ---
+Loading library: ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X ...
+  GMT already cached: Data/ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X.gmt
+  104 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[UC] 1312 query genes (p<0.05, corr pos)
+  9 terms significant (adj. p < 0.05)
+        Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+    MYC CHEA 9.362488e-10      9.736988e-08    2.695462       20.613877
+ TAF7 ENCODE 2.426150e-05      1.261598e-03    2.023076        7.487720
+KAT2A ENCODE 3.818009e-05      1.323576e-03    4.282483       14.797251
+  MYC ENCODE 1.989129e-04      5.171736e-03    1.545572        3.710706
+  PML ENCODE 3.714950e-04      7.727096e-03    1.512270        3.266694
+ SIX5 ENCODE 2.978379e-03      4.199433e-02    1.494761        2.337985
+   IRF8 CHEA 2.980216e-03      4.199433e-02    2.703590        5.784241
+GABPA ENCODE 3.230333e-03      4.199433e-02    1.353140        1.734477
+ ETS1 ENCODE 3.820329e-03      4.414603e-02    2.400074        4.874272
+  Results -> Results/UC/Tables/enrichr_ENCODE_ChEA_TFs_pm4_weeks.tsv
+
+Done.
+
+[Step 4] GO enrichment (negative correlation) ...
+  Library: GO_BP
+    --- HD ---
+Loading library: GO_Biological_Process_2023 ...
+  GMT already cached: Data/GO_Biological_Process_2023.gmt
+  5407 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[HD] 3189 query genes (p<0.05, corr neg)
+  932 terms significant (adj. p < 0.05)
+                                                           Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+        Positive Regulation Of Cytokine Production (GO:0001819) 8.516830e-30      4.605050e-26    4.710838      103.741051
+       Antigen Receptor-Mediated Signaling Pathway (GO:0050851) 6.821116e-26      1.844089e-22    7.998797      120.489075
+            Cellular Response To Cytokine Stimulus (GO:0071345) 7.384235e-23      1.330885e-19    4.073477       71.573323
+Positive Regulation Of DNA-templated Transcription (GO:0045893) 2.943164e-22      3.978422e-19    2.221898       39.580684
+         Regulation Of DNA-templated Transcription (GO:0006355) 1.608677e-21      1.739624e-18    1.938791       31.698905
+                             Inflammatory Response (GO:0006954) 4.249111e-21      3.829157e-18    4.466282       70.199830
+          Positive Regulation Of T Cell Activation (GO:0050870) 2.421642e-20      1.767107e-17    7.653186       91.920880
+                     Regulation Of Gene Expression (GO:0010468) 2.614547e-20      1.767107e-17    2.225946       36.080696
+  Regulation Of Transcription By RNA Polymerase II (GO:0006357) 1.043235e-19      6.267526e-17    1.861464       27.157784
+                 B Cell Receptor Signaling Pathway (GO:0050853) 4.322967e-19      2.337429e-16   17.119521      120.099174
+                             DNA Metabolic Process (GO:0006259) 2.935676e-18      1.443018e-15    3.726009       53.099649
+               Cytokine-Mediated Signaling Pathway (GO:0019221) 7.152400e-18      3.222752e-15    3.820609       52.918148
+        Negative Regulation Of Cytokine Production (GO:0001818) 1.038753e-17      4.320415e-15    4.791391       61.271977
+                Regulation Of B Cell Proliferation (GO:0030888) 4.560364e-17      1.761278e-14   14.991294      101.872725
+   Positive Regulation Of Lymphocyte Proliferation (GO:0050671) 4.933555e-17      1.778382e-14    8.709700       81.270050
+  Results -> Results/HD/Tables/enrichr_GO_BP_pm4_weeks.tsv
+
+Done.
+    --- CD ---
+Loading library: GO_Biological_Process_2023 ...
+  GMT already cached: Data/GO_Biological_Process_2023.gmt
+  5407 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[CD] 1590 query genes (p<0.05, corr neg)
+  2 terms significant (adj. p < 0.05)
+                                                            Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+Negative Regulation Of Execution Phase Of Apoptosis (GO:1900118) 8.039075e-08          0.000435   17.904364       47.131145
+         Regulation Of Execution Phase Of Apoptosis (GO:1900117) 9.141573e-07          0.002471   11.934345       34.476993
+  Results -> Results/CD/Tables/enrichr_GO_BP_pm4_weeks.tsv
+
+Done.
+    --- UC ---
+Loading library: GO_Biological_Process_2023 ...
+  GMT already cached: Data/GO_Biological_Process_2023.gmt
+  5407 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[UC] 361 query genes (p<0.05, corr neg)
+  6 terms significant (adj. p < 0.05)
+                                               Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+         Cellular Response To Zinc Ion (GO:0071294) 7.502175e-09          0.000041   61.374648       77.021077
+       Cellular Response To Copper Ion (GO:0071280) 5.547751e-08          0.000150   39.449095       61.399469
+                Response To Copper Ion (GO:0046688) 1.405416e-07          0.000253   32.484507       54.918655
+                  Response To Zinc Ion (GO:0010043) 2.420579e-07          0.000327   29.063306       51.330904
+           Actin Filament Organization (GO:0007015) 2.360193e-05          0.022728    6.404043       19.784065
+Glomerular Epithelial Cell Development (GO:0072310) 2.522073e-05          0.022728   91.307263       47.795968
+  Results -> Results/UC/Tables/enrichr_GO_BP_pm4_weeks.tsv
+
+Done.
+  Library: GO_MF
+    --- HD ---
+Loading library: GO_Molecular_Function_2023 ...
+  GMT already cached: Data/GO_Molecular_Function_2023.gmt
+  1147 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[HD] 3189 query genes (p<0.05, corr neg)
+  98 terms significant (adj. p < 0.05)
+                                                                                        Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+                                                                    DNA Binding (GO:0003677) 7.500927e-19      8.603564e-16    2.410073       36.711678
+                                                                    RNA Binding (GO:0003723) 1.809744e-17      1.037888e-14    1.986693       26.463997
+                                                                 Kinase Binding (GO:0019900) 1.594732e-13      6.097193e-11    2.592907       28.075464
+                                                     Cytokine Receptor Activity (GO:0004896) 7.026882e-13      2.014958e-10    6.504525       52.399729
+                                                      GTPase Regulator Activity (GO:0030695) 1.480533e-12      3.396343e-10    2.564989       25.657526
+                                                         Protein Kinase Binding (GO:0019901) 2.253235e-11      4.307434e-09    2.308406       20.509090
+                                                    Single-Stranded DNA Binding (GO:0003697) 1.232366e-10      1.851553e-08    4.958749       36.533382
+                                     Guanyl-Nucleotide Exchange Factor Activity (GO:0005085) 1.291406e-10      1.851553e-08    3.219969       26.626735
+                            Cis-Regulatory Region Sequence-Specific DNA Binding (GO:0000987) 1.553672e-10      1.980069e-08    1.785524       13.092921
+RNA Polymerase II Transcription Regulatory Region Sequence-Specific DNA Binding (GO:0000977) 2.644387e-10      3.033112e-08    1.729050       12.075834
+          RNA Polymerase II Cis-Regulatory Region Sequence-Specific DNA Binding (GO:0000978) 7.933456e-10      7.870670e-08    1.739744       11.603447
+                         Non-Membrane Spanning Protein Tyrosine Kinase Activity (GO:0004715) 8.234354e-10      7.870670e-08    9.411857       46.896495
+                                                    Double-Stranded DNA Binding (GO:0003690) 2.813598e-08      2.482459e-06    1.894884       11.112531
+                                                  Sequence-Specific DNA Binding (GO:0043565) 3.557694e-08      2.914768e-06    1.826759       10.334560
+                                              Protein Kinase Activator Activity (GO:0030295) 1.980698e-07      1.514573e-05    3.991408       21.363772
+  Results -> Results/HD/Tables/enrichr_GO_MF_pm4_weeks.tsv
+
+Done.
+    --- CD ---
+Loading library: GO_Molecular_Function_2023 ...
+  GMT already cached: Data/GO_Molecular_Function_2023.gmt
+  1147 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[CD] 1590 query genes (p<0.05, corr neg)
+  1 terms significant (adj. p < 0.05)
+                                     Name  P_value  Adjusted_p_value  Odds_ratio  Combined_score
+Receptor Antagonist Activity (GO:0048019) 0.000008          0.008829    8.522906       25.230068
+  Results -> Results/CD/Tables/enrichr_GO_MF_pm4_weeks.tsv
+
+Done.
+    --- UC ---
+Loading library: GO_Molecular_Function_2023 ...
+  GMT already cached: Data/GO_Molecular_Function_2023.gmt
+  1147 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[UC] 361 query genes (p<0.05, corr neg)
+  1 terms significant (adj. p < 0.05)
+                         Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+Cadherin Binding (GO:0045296) 5.198110e-08           0.00006    5.579653       28.833855
+  Results -> Results/UC/Tables/enrichr_GO_MF_pm4_weeks.tsv
+
+Done.
+  Library: GO_CC
+    --- HD ---
+Loading library: GO_Cellular_Component_2023 ...
+  GMT already cached: Data/GO_Cellular_Component_2023.gmt
+  474 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[HD] 3189 query genes (p<0.05, corr neg)
+  88 terms significant (adj. p < 0.05)
+                                                     Name      P_value  Adjusted_p_value  Odds_ratio  Combined_score
+    Intracellular Membrane-Bounded Organelle (GO:0043231) 2.789146e-65      1.322055e-62    2.201422      117.294146
+                                     Nucleus (GO:0005634) 2.328834e-59      5.519338e-57    2.204686      106.734666
+Intracellular Non-Membrane-Bounded Organelle (GO:0043232) 2.057211e-25      3.250394e-23    2.401090       49.790325
+                               Nuclear Lumen (GO:0031981) 2.830834e-18      3.354538e-16    2.439752       36.037932
+                                   Nucleolus (GO:0005730) 2.497385e-17      2.367521e-15    2.399777       33.464482
+                               Membrane Raft (GO:0045121) 2.928267e-12      2.313331e-10    3.869471       35.934223
+                           Neuron Projection (GO:0043005) 5.633351e-10      3.814584e-08    2.120124       16.004268
+                            Tertiary Granule (GO:0070820) 2.841783e-09      1.683756e-07    3.311249       23.561969
+                  Secretory Granule Membrane (GO:0030667) 1.047852e-08      5.518688e-07    2.545403       17.166570
+                                     Spindle (GO:0005819) 1.421437e-08      6.737612e-07    2.860798       18.992347
+                     Cell-Substrate Junction (GO:0030055) 1.947845e-08      8.393442e-07    2.204644       14.035679
+                              Focal Adhesion (GO:0005925) 4.497735e-08      1.776605e-06    2.177910       13.167700
+                             Mitotic Spindle (GO:0072686) 9.152709e-08      3.332125e-06    3.239930       19.051734
+                                        Axon (GO:0030424) 9.841720e-08      3.332125e-06    2.716710       16.124717
+                          Nuclear Chromosome (GO:0000228) 1.337366e-07      4.226078e-06    3.951057       21.746572
+  Results -> Results/HD/Tables/enrichr_GO_CC_pm4_weeks.tsv
+
+Done.
+    --- CD ---
+Loading library: GO_Cellular_Component_2023 ...
+  GMT already cached: Data/GO_Cellular_Component_2023.gmt
+  474 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[CD] 1590 query genes (p<0.05, corr neg)
+  2 terms significant (adj. p < 0.05)
+                                     Name  P_value  Adjusted_p_value  Odds_ratio  Combined_score
+Mitochondrial Inner Membrane (GO:0005743) 0.000010          0.004732    2.394379       10.053645
+    Organelle Inner Membrane (GO:0019866) 0.000047          0.011126    2.204372        7.877971
+  Results -> Results/CD/Tables/enrichr_GO_CC_pm4_weeks.tsv
+
+Done.
+    --- UC ---
+Loading library: GO_Cellular_Component_2023 ...
+  GMT already cached: Data/GO_Cellular_Component_2023.gmt
+  474 gene sets loaded
+Loading background genes from Data/host_tx_counts_filtered.tsv ...
+  33052 background genes
+
+[UC] 361 query genes (p<0.05, corr neg)
+  11 terms significant (adj. p < 0.05)
+                                     Name  P_value  Adjusted_p_value  Odds_ratio  Combined_score
+          Actin Cytoskeleton (GO:0015629) 0.000002          0.001173    4.665086       19.882385
+       Endolysosome Membrane (GO:0036020) 0.000038          0.008993   26.152061       33.224840
+                Cytoskeleton (GO:0005856) 0.000059          0.009325    3.083834       10.966305
+                Endolysosome (GO:0036019) 0.000201          0.022291   15.914261       23.550095
+      Cation Channel Complex (GO:0034703) 0.000235          0.022291    9.967330       19.211548
+          Cell-Cell Junction (GO:0005911) 0.000293          0.023178    3.773873       10.802773
+            Tertiary Granule (GO:0070820) 0.000364          0.024682    4.916487       12.608544
+      Specific Granule Lumen (GO:0035580) 0.000505          0.029896    8.334014       16.097217
+Platelet Alpha Granule Lumen (GO:0031093) 0.000680          0.034944    7.768044       14.952245
+     Apical Junction Complex (GO:0043296) 0.000737          0.034944    5.988794       12.909825
+           Adherens Junction (GO:0005912) 0.000947          0.040805    4.804347       10.927432
+  Results -> Results/UC/Tables/enrichr_GO_CC_pm4_weeks.tsv
+
+Done.
+
+[Step 5] BTNL3 / BTNL8 direct correlation and week sensitivity ...
+=== BTNL3/BTNL8 - Candida correlation analysis (Kraken 2024-10) ===
+
+Loading host transcriptomics ...
+  100 host-week rows, 33052 genes
+  1295 host-weeks with Candida data
+
+--- Scatter plots (+-4 weeks) ---
+  HD/BTNL3: r=0.323, p=4.48e-02, n=39
+  HD/BTNL8: r=0.361, p=2.41e-02, n=39
+  CD/BTNL3: r=-0.319, p=2.39e-02, n=50
+  CD/BTNL8: r=-0.269, p=5.90e-02, n=50
+  UC/BTNL3: r=-0.178, p=3.74e-01, n=27
+  UC/BTNL8: r=-0.210, p=2.93e-01, n=27
+
+Summary -> Results/BTNL/Tables/btnl_correlation_summary.tsv
+Diagnosis  Gene  Correlation        Slope  P_value  N
+       HD BTNL3     0.323195  3693.307686 0.044760 39
+       HD BTNL8     0.360550  4346.017105 0.024145 39
+       CD BTNL3    -0.319066 -6699.645879 0.023917 50
+       CD BTNL8    -0.268881 -6097.504176 0.059010 50
+       UC BTNL3    -0.178054 -2542.497604 0.374246 27
+       UC BTNL8    -0.210078 -3328.101720 0.292920 27
+
+--- Sensitivity analysis ---
+  HD:   0%|          | 0/52 [00:00<?, ?it/s]  HD:   2%|▏         | 1/52 [00:01<00:58,  1.14s/it]  HD:   4%|▍         | 2/52 [00:02<00:53,  1.07s/it]  HD:   6%|▌         | 3/52 [00:03<00:56,  1.15s/it]  HD:   8%|▊         | 4/52 [00:04<00:53,  1.12s/it]  HD:  10%|▉         | 5/52 [00:05<00:54,  1.15s/it]  HD:  12%|█▏        | 6/52 [00:06<00:53,  1.16s/it]  HD:  13%|█▎        | 7/52 [00:07<00:50,  1.13s/it]  HD:  15%|█▌        | 8/52 [00:08<00:48,  1.11s/it]  HD:  17%|█▋        | 9/52 [00:10<00:48,  1.12s/it]  HD:  19%|█▉        | 10/52 [00:11<00:47,  1.12s/it]  HD:  21%|██        | 11/52 [00:12<00:46,  1.12s/it]  HD:  23%|██▎       | 12/52 [00:13<00:45,  1.13s/it]  HD:  25%|██▌       | 13/52 [00:14<00:45,  1.16s/it]  HD:  27%|██▋       | 14/52 [00:16<00:45,  1.19s/it]  HD:  29%|██▉       | 15/52 [00:17<00:43,  1.16s/it]  HD:  31%|███       | 16/52 [00:18<00:42,  1.19s/it]  HD:  33%|███▎      | 17/52 [00:19<00:40,  1.16s/it]  HD:  35%|███▍      | 18/52 [00:20<00:38,  1.13s/it]  HD:  37%|███▋      | 19/52 [00:21<00:37,  1.14s/it]  HD:  38%|███▊      | 20/52 [00:22<00:36,  1.14s/it]  HD:  40%|████      | 21/52 [00:24<00:36,  1.16s/it]  HD:  42%|████▏     | 22/52 [00:25<00:34,  1.15s/it]  HD:  44%|████▍     | 23/52 [00:26<00:32,  1.12s/it]  HD:  46%|████▌     | 24/52 [00:27<00:30,  1.10s/it]  HD:  48%|████▊     | 25/52 [00:28<00:29,  1.10s/it]  HD:  50%|█████     | 26/52 [00:29<00:27,  1.06s/it]  HD:  52%|█████▏    | 27/52 [00:30<00:26,  1.05s/it]  HD:  54%|█████▍    | 28/52 [00:31<00:25,  1.06s/it]  HD:  56%|█████▌    | 29/52 [00:32<00:24,  1.07s/it]  HD:  58%|█████▊    | 30/52 [00:33<00:23,  1.07s/it]  HD:  60%|█████▉    | 31/52 [00:34<00:22,  1.05s/it]  HD:  62%|██████▏   | 32/52 [00:35<00:20,  1.04s/it]  HD:  63%|██████▎   | 33/52 [00:36<00:19,  1.04s/it]  HD:  65%|██████▌   | 34/52 [00:37<00:18,  1.03s/it]  HD:  67%|██████▋   | 35/52 [00:38<00:17,  1.06s/it]  HD:  69%|██████▉   | 36/52 [00:39<00:16,  1.06s/it]  HD:  71%|███████   | 37/52 [00:40<00:15,  1.07s/it]  HD:  73%|███████▎  | 38/52 [00:42<00:15,  1.09s/it]  HD:  75%|███████▌  | 39/52 [00:43<00:14,  1.08s/it]  HD:  77%|███████▋  | 40/52 [00:44<00:12,  1.08s/it]  HD:  79%|███████▉  | 41/52 [00:45<00:12,  1.09s/it]  HD:  81%|████████  | 42/52 [00:46<00:10,  1.07s/it]  HD:  83%|████████▎ | 43/52 [00:47<00:09,  1.09s/it]  HD:  85%|████████▍ | 44/52 [00:48<00:08,  1.07s/it]  HD:  87%|████████▋ | 45/52 [00:49<00:07,  1.09s/it]  HD:  88%|████████▊ | 46/52 [00:50<00:06,  1.11s/it]  HD:  90%|█████████ | 47/52 [00:51<00:05,  1.07s/it]  HD:  92%|█████████▏| 48/52 [00:52<00:04,  1.10s/it]  HD:  94%|█████████▍| 49/52 [00:54<00:03,  1.10s/it]  HD:  96%|█████████▌| 50/52 [00:55<00:02,  1.11s/it]  HD:  98%|█████████▊| 51/52 [00:56<00:01,  1.11s/it]  HD: 100%|██████████| 52/52 [00:57<00:00,  1.13s/it]  HD: 100%|██████████| 52/52 [00:57<00:00,  1.11s/it]
+  CD:   0%|          | 0/52 [00:00<?, ?it/s]  CD:   2%|▏         | 1/52 [00:01<00:57,  1.14s/it]  CD:   4%|▍         | 2/52 [00:02<00:52,  1.04s/it]  CD:   6%|▌         | 3/52 [00:03<00:48,  1.00it/s]  CD:   8%|▊         | 4/52 [00:04<00:49,  1.04s/it]  CD:  10%|▉         | 5/52 [00:05<00:47,  1.01s/it]  CD:  12%|█▏        | 6/52 [00:06<00:46,  1.01s/it]  CD:  13%|█▎        | 7/52 [00:07<00:45,  1.01s/it]  CD:  15%|█▌        | 8/52 [00:08<00:46,  1.07s/it]  CD:  17%|█▋        | 9/52 [00:09<00:46,  1.09s/it]  CD:  19%|█▉        | 10/52 [00:10<00:46,  1.10s/it]  CD:  21%|██        | 11/52 [00:11<00:43,  1.07s/it]  CD:  23%|██▎       | 12/52 [00:12<00:45,  1.13s/it]  CD:  25%|██▌       | 13/52 [00:13<00:42,  1.10s/it]  CD:  27%|██▋       | 14/52 [00:15<00:42,  1.12s/it]  CD:  29%|██▉       | 15/52 [00:16<00:41,  1.11s/it]  CD:  31%|███       | 16/52 [00:17<00:40,  1.12s/it]  CD:  33%|███▎      | 17/52 [00:18<00:38,  1.11s/it]  CD:  35%|███▍      | 18/52 [00:19<00:37,  1.11s/it]  CD:  37%|███▋      | 19/52 [00:20<00:36,  1.10s/it]  CD:  38%|███▊      | 20/52 [00:21<00:37,  1.16s/it]  CD:  40%|████      | 21/52 [00:22<00:35,  1.15s/it]  CD:  42%|████▏     | 22/52 [00:24<00:34,  1.15s/it]  CD:  44%|████▍     | 23/52 [00:25<00:33,  1.15s/it]  CD:  46%|████▌     | 24/52 [00:26<00:32,  1.14s/it]  CD:  48%|████▊     | 25/52 [00:27<00:30,  1.15s/it]  CD:  50%|█████     | 26/52 [00:28<00:29,  1.14s/it]  CD:  52%|█████▏    | 27/52 [00:29<00:28,  1.15s/it]  CD:  54%|█████▍    | 28/52 [00:30<00:26,  1.11s/it]  CD:  56%|█████▌    | 29/52 [00:31<00:25,  1.10s/it]  CD:  58%|█████▊    | 30/52 [00:33<00:25,  1.14s/it]  CD:  60%|█████▉    | 31/52 [00:34<00:24,  1.15s/it]  CD:  62%|██████▏   | 32/52 [00:35<00:22,  1.14s/it]  CD:  63%|██████▎   | 33/52 [00:36<00:22,  1.17s/it]  CD:  65%|██████▌   | 34/52 [00:37<00:20,  1.15s/it]  CD:  67%|██████▋   | 35/52 [00:39<00:20,  1.23s/it]  CD:  69%|██████▉   | 36/52 [00:40<00:19,  1.22s/it]  CD:  71%|███████   | 37/52 [00:41<00:18,  1.24s/it]  CD:  73%|███████▎  | 38/52 [00:42<00:16,  1.20s/it]  CD:  75%|███████▌  | 39/52 [00:43<00:15,  1.16s/it]  CD:  77%|███████▋  | 40/52 [00:45<00:14,  1.17s/it]  CD:  79%|███████▉  | 41/52 [00:46<00:12,  1.16s/it]  CD:  81%|████████  | 42/52 [00:47<00:11,  1.18s/it]  CD:  83%|████████▎ | 43/52 [00:48<00:10,  1.22s/it]  CD:  85%|████████▍ | 44/52 [00:49<00:09,  1.20s/it]  CD:  87%|████████▋ | 45/52 [00:51<00:08,  1.18s/it]  CD:  88%|████████▊ | 46/52 [00:52<00:07,  1.18s/it]  CD:  90%|█████████ | 47/52 [00:53<00:05,  1.17s/it]  CD:  92%|█████████▏| 48/52 [00:54<00:04,  1.20s/it]  CD:  94%|█████████▍| 49/52 [00:55<00:03,  1.23s/it]  CD:  96%|█████████▌| 50/52 [00:57<00:02,  1.28s/it]  CD:  98%|█████████▊| 51/52 [00:58<00:01,  1.24s/it]  CD: 100%|██████████| 52/52 [00:59<00:00,  1.22s/it]  CD: 100%|██████████| 52/52 [00:59<00:00,  1.15s/it]
+  UC:   0%|          | 0/52 [00:00<?, ?it/s]  UC:   2%|▏         | 1/52 [00:01<00:53,  1.05s/it]  UC:   4%|▍         | 2/52 [00:02<00:52,  1.04s/it]  UC:   6%|▌         | 3/52 [00:03<00:50,  1.04s/it]  UC:   8%|▊         | 4/52 [00:04<00:50,  1.05s/it]  UC:  10%|▉         | 5/52 [00:05<00:48,  1.03s/it]  UC:  12%|█▏        | 6/52 [00:06<00:46,  1.01s/it]  UC:  13%|█▎        | 7/52 [00:07<00:45,  1.01s/it]  UC:  15%|█▌        | 8/52 [00:08<00:44,  1.02s/it]  UC:  17%|█▋        | 9/52 [00:09<00:44,  1.03s/it]  UC:  19%|█▉        | 10/52 [00:10<00:43,  1.03s/it]  UC:  21%|██        | 11/52 [00:11<00:43,  1.05s/it]  UC:  23%|██▎       | 12/52 [00:12<00:42,  1.06s/it]  UC:  25%|██▌       | 13/52 [00:13<00:40,  1.03s/it]  UC:  27%|██▋       | 14/52 [00:14<00:39,  1.04s/it]  UC:  29%|██▉       | 15/52 [00:15<00:38,  1.04s/it]  UC:  31%|███       | 16/52 [00:16<00:36,  1.02s/it]  UC:  33%|███▎      | 17/52 [00:17<00:35,  1.02s/it]  UC:  35%|███▍      | 18/52 [00:18<00:35,  1.03s/it]  UC:  37%|███▋      | 19/52 [00:19<00:34,  1.06s/it]  UC:  38%|███▊      | 20/52 [00:20<00:34,  1.08s/it]  UC:  40%|████      | 21/52 [00:21<00:33,  1.08s/it]  UC:  42%|████▏     | 22/52 [00:22<00:31,  1.06s/it]  UC:  44%|████▍     | 23/52 [00:24<00:31,  1.08s/it]  UC:  46%|████▌     | 24/52 [00:25<00:29,  1.06s/it]  UC:  48%|████▊     | 25/52 [00:26<00:29,  1.09s/it]  UC:  50%|█████     | 26/52 [00:27<00:28,  1.10s/it]  UC:  52%|█████▏    | 27/52 [00:28<00:28,  1.12s/it]  UC:  54%|█████▍    | 28/52 [00:29<00:26,  1.12s/it]  UC:  56%|█████▌    | 29/52 [00:30<00:25,  1.10s/it]  UC:  58%|█████▊    | 30/52 [00:31<00:23,  1.08s/it]  UC:  60%|█████▉    | 31/52 [00:32<00:23,  1.11s/it]  UC:  62%|██████▏   | 32/52 [00:34<00:22,  1.13s/it]  UC:  63%|██████▎   | 33/52 [00:35<00:21,  1.15s/it]  UC:  65%|██████▌   | 34/52 [00:36<00:21,  1.18s/it]  UC:  67%|██████▋   | 35/52 [00:37<00:20,  1.20s/it]  UC:  69%|██████▉   | 36/52 [00:39<00:19,  1.22s/it]  UC:  71%|███████   | 37/52 [00:40<00:17,  1.20s/it]  UC:  73%|███████▎  | 38/52 [00:41<00:16,  1.20s/it]  UC:  75%|███████▌  | 39/52 [00:42<00:15,  1.20s/it]  UC:  77%|███████▋  | 40/52 [00:43<00:14,  1.19s/it]  UC:  79%|███████▉  | 41/52 [00:45<00:13,  1.22s/it]  UC:  81%|████████  | 42/52 [00:46<00:12,  1.23s/it]  UC:  83%|████████▎ | 43/52 [00:47<00:11,  1.25s/it]  UC:  85%|████████▍ | 44/52 [00:48<00:09,  1.24s/it]  UC:  87%|████████▋ | 45/52 [00:49<00:08,  1.20s/it]  UC:  88%|████████▊ | 46/52 [00:51<00:07,  1.22s/it]  UC:  90%|█████████ | 47/52 [00:52<00:06,  1.21s/it]  UC:  92%|█████████▏| 48/52 [00:53<00:04,  1.18s/it]  UC:  94%|█████████▍| 49/52 [00:54<00:03,  1.21s/it]  UC:  96%|█████████▌| 50/52 [00:55<00:02,  1.19s/it]  UC:  98%|█████████▊| 51/52 [00:57<00:01,  1.20s/it]  UC: 100%|██████████| 52/52 [00:58<00:00,  1.20s/it]  UC: 100%|██████████| 52/52 [00:58<00:00,  1.12s/it]
+  BTNL3 table -> Results/BTNL/Tables/BTNL3_sensitivity_combined.tsv
+  BTNL3 plot -> Results/BTNL/Figures/BTNL3_sensitivity_plot.png (+ .pdf)
+  BTNL8 table -> Results/BTNL/Tables/BTNL8_sensitivity_combined.tsv
+  BTNL8 plot -> Results/BTNL/Figures/BTNL8_sensitivity_plot.png (+ .pdf)
+
+Done.
+
+[Step 6] HNF4A enrichment sensitivity to +-week window (HD/CD/UC) ...
+=== HNF4A enrichment sensitivity to week window (Kraken 2024-10) ===
+
+Loading host transcriptomics ...
+  100 host-week rows, 33052 genes
+  104 TF gene sets, 33052 background genes
+
+  355 HD host-weeks with Candida data
+  581 CD host-weeks with Candida data
+  359 UC host-weeks with Candida data
+  HD:   0%|          | 0/52 [00:00<?, ?it/s]  HD:   2%|▏         | 1/52 [00:07<06:04,  7.14s/it]  HD:   4%|▍         | 2/52 [00:14<05:58,  7.17s/it]  HD:   6%|▌         | 3/52 [00:21<05:49,  7.13s/it]  HD:   8%|▊         | 4/52 [00:28<05:45,  7.20s/it]  HD:  10%|▉         | 5/52 [00:35<05:38,  7.20s/it]  HD:  12%|█▏        | 6/52 [00:43<05:32,  7.23s/it]  HD:  13%|█▎        | 7/52 [00:50<05:23,  7.18s/it]  HD:  15%|█▌        | 8/52 [00:57<05:18,  7.23s/it]  HD:  17%|█▋        | 9/52 [01:05<05:18,  7.40s/it]  HD:  19%|█▉        | 10/52 [01:13<05:14,  7.49s/it]  HD:  21%|██        | 11/52 [01:20<05:07,  7.51s/it]  HD:  23%|██▎       | 12/52 [01:28<05:00,  7.52s/it]  HD:  25%|██▌       | 13/52 [01:35<04:49,  7.43s/it]  HD:  27%|██▋       | 14/52 [01:42<04:41,  7.42s/it]  HD:  29%|██▉       | 15/52 [01:50<04:35,  7.44s/it]  HD:  31%|███       | 16/52 [01:57<04:28,  7.46s/it]  HD:  33%|███▎      | 17/52 [02:05<04:23,  7.53s/it]  HD:  35%|███▍      | 18/52 [02:13<04:19,  7.64s/it]  HD:  37%|███▋      | 19/52 [02:20<04:10,  7.60s/it]  HD:  38%|███▊      | 20/52 [02:28<04:01,  7.56s/it]  HD:  40%|████      | 21/52 [02:36<03:56,  7.64s/it]  HD:  42%|████▏     | 22/52 [02:43<03:49,  7.66s/it]  HD:  44%|████▍     | 23/52 [02:51<03:41,  7.63s/it]  HD:  46%|████▌     | 24/52 [02:58<03:32,  7.57s/it]  HD:  48%|████▊     | 25/52 [03:06<03:25,  7.63s/it]  HD:  50%|█████     | 26/52 [03:14<03:16,  7.56s/it]  HD:  52%|█████▏    | 27/52 [03:21<03:08,  7.53s/it]  HD:  54%|█████▍    | 28/52 [03:29<03:03,  7.64s/it]  HD:  56%|█████▌    | 29/52 [03:37<02:55,  7.64s/it]  HD:  58%|█████▊    | 30/52 [03:44<02:48,  7.64s/it]  HD:  60%|█████▉    | 31/52 [03:54<02:53,  8.25s/it]  HD:  62%|██████▏   | 32/52 [04:01<02:36,  7.85s/it]  HD:  63%|██████▎   | 33/52 [04:08<02:23,  7.56s/it]  HD:  65%|██████▌   | 34/52 [04:14<02:10,  7.26s/it]  HD:  67%|██████▋   | 35/52 [04:21<01:59,  7.04s/it]  HD:  69%|██████▉   | 36/52 [04:27<01:50,  6.88s/it]  HD:  71%|███████   | 37/52 [04:34<01:41,  6.79s/it]  HD:  73%|███████▎  | 38/52 [04:40<01:34,  6.73s/it]  HD:  75%|███████▌  | 39/52 [04:47<01:26,  6.65s/it]  HD:  77%|███████▋  | 40/52 [04:53<01:19,  6.63s/it]  HD:  79%|███████▉  | 41/52 [05:00<01:12,  6.57s/it]  HD:  81%|████████  | 42/52 [05:06<01:05,  6.52s/it]  HD:  83%|████████▎ | 43/52 [05:13<00:58,  6.49s/it]  HD:  85%|████████▍ | 44/52 [05:19<00:51,  6.45s/it]  HD:  87%|████████▋ | 45/52 [05:25<00:44,  6.43s/it]  HD:  88%|████████▊ | 46/52 [05:32<00:38,  6.41s/it]  HD:  90%|█████████ | 47/52 [05:38<00:31,  6.39s/it]  HD:  92%|█████████▏| 48/52 [05:45<00:25,  6.40s/it]  HD:  94%|█████████▍| 49/52 [05:51<00:19,  6.40s/it]  HD:  96%|█████████▌| 50/52 [05:57<00:12,  6.43s/it]  HD:  98%|█████████▊| 51/52 [06:04<00:06,  6.42s/it]  HD: 100%|██████████| 52/52 [06:10<00:00,  6.42s/it]  HD: 100%|██████████| 52/52 [06:10<00:00,  7.13s/it]
+  HD saved -> Results-HNF4A-sensitivity/hnf4a_sensitivity_HD.tsv
+  CD:   0%|          | 0/52 [00:00<?, ?it/s]  CD:   2%|▏         | 1/52 [00:06<05:10,  6.09s/it]  CD:   4%|▍         | 2/52 [00:12<05:07,  6.15s/it]  CD:   6%|▌         | 3/52 [00:18<05:01,  6.16s/it]  CD:   8%|▊         | 4/52 [00:24<04:56,  6.18s/it]  CD:  10%|▉         | 5/52 [00:30<04:50,  6.19s/it]  CD:  12%|█▏        | 6/52 [00:37<04:45,  6.21s/it]  CD:  13%|█▎        | 7/52 [00:43<04:40,  6.24s/it]  CD:  15%|█▌        | 8/52 [00:49<04:36,  6.28s/it]  CD:  17%|█▋        | 9/52 [00:56<04:34,  6.37s/it]  CD:  19%|█▉        | 10/52 [01:03<04:32,  6.50s/it]  CD:  21%|██        | 11/52 [01:09<04:27,  6.54s/it]  CD:  23%|██▎       | 12/52 [01:16<04:21,  6.54s/it]  CD:  25%|██▌       | 13/52 [01:23<04:19,  6.66s/it]  CD:  27%|██▋       | 14/52 [01:30<04:14,  6.69s/it]  CD:  29%|██▉       | 15/52 [01:36<04:05,  6.65s/it]  CD:  31%|███       | 16/52 [01:43<03:59,  6.66s/it]  CD:  33%|███▎      | 17/52 [01:49<03:52,  6.64s/it]  CD:  35%|███▍      | 18/52 [01:56<03:44,  6.61s/it]  CD:  37%|███▋      | 19/52 [02:02<03:37,  6.59s/it]  CD:  38%|███▊      | 20/52 [02:09<03:31,  6.61s/it]  CD:  40%|████      | 21/52 [02:16<03:25,  6.62s/it]  CD:  42%|████▏     | 22/52 [02:22<03:18,  6.62s/it]  CD:  44%|████▍     | 23/52 [02:29<03:11,  6.62s/it]  CD:  46%|████▌     | 24/52 [02:36<03:05,  6.64s/it]  CD:  48%|████▊     | 25/52 [02:42<02:59,  6.63s/it]  CD:  50%|█████     | 26/52 [02:49<02:52,  6.64s/it]  CD:  52%|█████▏    | 27/52 [02:56<02:45,  6.63s/it]  CD:  54%|█████▍    | 28/52 [03:02<02:38,  6.62s/it]  CD:  56%|█████▌    | 29/52 [03:09<02:31,  6.60s/it]  CD:  58%|█████▊    | 30/52 [03:15<02:25,  6.59s/it]  CD:  60%|█████▉    | 31/52 [03:22<02:18,  6.59s/it]  CD:  62%|██████▏   | 32/52 [03:28<02:12,  6.61s/it]  CD:  63%|██████▎   | 33/52 [03:35<02:06,  6.65s/it]  CD:  65%|██████▌   | 34/52 [03:42<01:59,  6.63s/it]  CD:  67%|██████▋   | 35/52 [03:48<01:52,  6.60s/it]  CD:  69%|██████▉   | 36/52 [03:55<01:45,  6.61s/it]  CD:  71%|███████   | 37/52 [04:02<01:38,  6.60s/it]  CD:  73%|███████▎  | 38/52 [04:08<01:32,  6.61s/it]  CD:  75%|███████▌  | 39/52 [04:15<01:26,  6.62s/it]  CD:  77%|███████▋  | 40/52 [04:21<01:19,  6.63s/it]  CD:  79%|███████▉  | 41/52 [04:28<01:12,  6.62s/it]  CD:  81%|████████  | 42/52 [04:35<01:06,  6.63s/it]  CD:  83%|████████▎ | 43/52 [04:41<00:59,  6.63s/it]  CD:  85%|████████▍ | 44/52 [04:48<00:53,  6.65s/it]  CD:  87%|████████▋ | 45/52 [04:55<00:46,  6.65s/it]  CD:  88%|████████▊ | 46/52 [05:01<00:39,  6.66s/it]  CD:  90%|█████████ | 47/52 [05:08<00:33,  6.68s/it]  CD:  92%|█████████▏| 48/52 [05:15<00:26,  6.68s/it]  CD:  94%|█████████▍| 49/52 [05:21<00:19,  6.66s/it]  CD:  96%|█████████▌| 50/52 [05:28<00:13,  6.66s/it]  CD:  98%|█████████▊| 51/52 [05:35<00:06,  6.66s/it]  CD: 100%|██████████| 52/52 [05:41<00:00,  6.65s/it]  CD: 100%|██████████| 52/52 [05:41<00:00,  6.57s/it]
+  CD saved -> Results-HNF4A-sensitivity/hnf4a_sensitivity_CD.tsv
+  UC:   0%|          | 0/52 [00:00<?, ?it/s]  UC:   2%|▏         | 1/52 [00:06<05:07,  6.04s/it]  UC:   4%|▍         | 2/52 [00:12<05:04,  6.10s/it]  UC:   6%|▌         | 3/52 [00:18<05:00,  6.14s/it]  UC:   8%|▊         | 4/52 [00:24<04:55,  6.15s/it]  UC:  10%|▉         | 5/52 [00:30<04:49,  6.15s/it]  UC:  12%|█▏        | 6/52 [00:36<04:43,  6.17s/it]  UC:  13%|█▎        | 7/52 [00:43<04:37,  6.17s/it]  UC:  15%|█▌        | 8/52 [00:49<04:32,  6.18s/it]  UC:  17%|█▋        | 9/52 [00:55<04:26,  6.19s/it]  UC:  19%|█▉        | 10/52 [01:01<04:20,  6.21s/it]  UC:  21%|██        | 11/52 [01:07<04:14,  6.21s/it]  UC:  23%|██▎       | 12/52 [01:14<04:09,  6.23s/it]  UC:  25%|██▌       | 13/52 [01:20<04:03,  6.24s/it]  UC:  27%|██▋       | 14/52 [01:26<03:57,  6.26s/it]  UC:  29%|██▉       | 15/52 [01:33<03:51,  6.26s/it]  UC:  31%|███       | 16/52 [01:39<03:45,  6.27s/it]  UC:  33%|███▎      | 17/52 [01:45<03:40,  6.29s/it]  UC:  35%|███▍      | 18/52 [01:51<03:34,  6.30s/it]  UC:  37%|███▋      | 19/52 [01:58<03:27,  6.29s/it]  UC:  38%|███▊      | 20/52 [02:04<03:21,  6.30s/it]  UC:  40%|████      | 21/52 [02:10<03:15,  6.31s/it]  UC:  42%|████▏     | 22/52 [02:17<03:09,  6.31s/it]  UC:  44%|████▍     | 23/52 [02:23<03:03,  6.31s/it]  UC:  46%|████▌     | 24/52 [02:29<02:56,  6.32s/it]  UC:  48%|████▊     | 25/52 [02:36<02:50,  6.32s/it]  UC:  50%|█████     | 26/52 [02:42<02:44,  6.33s/it]  UC:  52%|█████▏    | 27/52 [02:48<02:38,  6.33s/it]  UC:  54%|█████▍    | 28/52 [02:55<02:32,  6.34s/it]  UC:  56%|█████▌    | 29/52 [03:01<02:25,  6.34s/it]  UC:  58%|█████▊    | 30/52 [03:07<02:19,  6.35s/it]  UC:  60%|█████▉    | 31/52 [03:14<02:13,  6.36s/it]  UC:  62%|██████▏   | 32/52 [03:20<02:07,  6.38s/it]  UC:  63%|██████▎   | 33/52 [03:27<02:01,  6.39s/it]  UC:  65%|██████▌   | 34/52 [03:33<01:55,  6.41s/it]  UC:  67%|██████▋   | 35/52 [03:40<01:48,  6.41s/it]  UC:  69%|██████▉   | 36/52 [03:46<01:42,  6.43s/it]  UC:  71%|███████   | 37/52 [03:52<01:36,  6.43s/it]  UC:  73%|███████▎  | 38/52 [03:59<01:30,  6.45s/it]  UC:  75%|███████▌  | 39/52 [04:05<01:23,  6.44s/it]  UC:  77%|███████▋  | 40/52 [04:12<01:17,  6.45s/it]  UC:  79%|███████▉  | 41/52 [04:18<01:11,  6.46s/it]  UC:  81%|████████  | 42/52 [04:25<01:04,  6.47s/it]  UC:  83%|████████▎ | 43/52 [04:31<00:58,  6.47s/it]  UC:  85%|████████▍ | 44/52 [04:38<00:51,  6.47s/it]  UC:  87%|████████▋ | 45/52 [04:44<00:45,  6.47s/it]  UC:  88%|████████▊ | 46/52 [04:51<00:38,  6.47s/it]  UC:  90%|█████████ | 47/52 [04:57<00:32,  6.47s/it]  UC:  92%|█████████▏| 48/52 [05:04<00:25,  6.48s/it]  UC:  94%|█████████▍| 49/52 [05:10<00:19,  6.55s/it]  UC:  96%|█████████▌| 50/52 [05:17<00:13,  6.55s/it]  UC:  98%|█████████▊| 51/52 [05:23<00:06,  6.54s/it]  UC: 100%|██████████| 52/52 [05:30<00:00,  6.52s/it]  UC: 100%|██████████| 52/52 [05:30<00:00,  6.35s/it]
+  UC saved -> Results-HNF4A-sensitivity/hnf4a_sensitivity_UC.tsv
+
+Combined -> Results-HNF4A-sensitivity/hnf4a_sensitivity_combined.tsv
+Plot -> Results-HNF4A-sensitivity/hnf4a_sensitivity_plot.png (+ .pdf)
+
+Done.
+
+[Step 7] HNF4A + BTNL3/BTNL8 ranking of 13 curated fungi ...
+=== HNF4A + BTNL3/BTNL8 per fungal species (HD, +-4w, Kraken 2024-10) ===
+
+Loading host transcriptomics ...
+  100 host-week rows, 33052 genes
+  104 TF gene sets, 33052 background genes
+
+  Analysing 13 fungal species
+
+  taxa:   0%|          | 0/13 [00:00<?, ?it/s]  taxa:   8%|▊         | 1/13 [00:06<01:15,  6.26s/it]  taxa:  15%|█▌        | 2/13 [00:12<01:09,  6.29s/it]  taxa:  23%|██▎       | 3/13 [00:18<01:02,  6.26s/it]  taxa:  31%|███       | 4/13 [00:24<00:55,  6.21s/it]  taxa:  38%|███▊      | 5/13 [00:31<00:49,  6.20s/it]  taxa:  46%|████▌     | 6/13 [00:37<00:43,  6.17s/it]  taxa:  54%|█████▍    | 7/13 [00:43<00:36,  6.15s/it]  taxa:  62%|██████▏   | 8/13 [00:49<00:30,  6.15s/it]  taxa:  69%|██████▉   | 9/13 [00:55<00:24,  6.14s/it]  taxa:  77%|███████▋  | 10/13 [01:01<00:18,  6.16s/it]  taxa:  85%|████████▍ | 11/13 [01:07<00:12,  6.14s/it]  taxa:  92%|█████████▏| 12/13 [01:14<00:06,  6.14s/it]  taxa: 100%|██████████| 13/13 [01:20<00:00,  6.13s/it]  taxa: 100%|██████████| 13/13 [01:20<00:00,  6.17s/it]
+
+Uncapped table -> Results-HNF4A-fungi/hnf4a_btnl_fungal_ranking.tsv
+
+Uncapped ranking:
+                       Taxon prevalence  n_samples HNF4A_pval BTNL3_r BTNL3_pval BTNL8_r BTNL8_pval combined_pval_geomean
+     S__Candida dubliniensis      0.868         38  7.273e-38  +0.096  5.675e-01  +0.146  3.813e-01             2.506e-13
+   S__Nakaseomyces glabratus      0.784         32  3.854e-16  -0.007  9.701e-01  +0.047  7.984e-01             6.683e-06
+         S__Candida albicans      0.869         39  2.122e-09  +0.323  4.476e-02  +0.361  2.415e-02             1.319e-04
+     S__Malassezia restricta      0.992         40  2.267e-10  +0.054  7.420e-01  +0.115  4.782e-01             4.317e-04
+    S__Debaryomyces hansenii      0.779         35  7.056e-02  -0.592  1.794e-04  -0.577  2.826e-04             1.529e-03
+      S__Malassezia japonica      0.814         38  5.111e-04  +0.339  3.762e-02  +0.397  1.366e-02             6.404e-03
+    S__Candida orthopsilosis      0.778         35  9.999e-01  -0.523  1.272e-03  -0.494  2.557e-03             1.482e-02
+  S__Cryptococcus neoformans      0.846         39  7.501e-01  +0.187  2.549e-01  +0.162  3.245e-01             3.959e-01
+S__Lodderomyces beijingensis      0.758         33  7.526e-01  -0.123  4.964e-01  -0.143  4.275e-01             5.426e-01
+ S__Saccharomyces cerevisiae      0.939         40  3.047e-01  +0.054  7.397e-01  -0.008  9.618e-01             6.007e-01
+S__Lodderomyces elongisporus      0.844         37  6.492e-01  +0.041  8.107e-01  +0.071  6.784e-01             7.094e-01
+    S__Aspergillus fumigatus      0.850         39  6.944e-01  -0.002  9.917e-01  -0.063  7.026e-01             7.851e-01
+      S__Pichia kudriavzevii      0.775         34  9.974e-01  -0.038  8.294e-01  -0.008  9.655e-01             9.278e-01
+Uncapped plot -> Results-HNF4A-fungi/hnf4a_btnl_fungal_ranking_plot.png (+ .pdf)
+
+Capped table -> Results-HNF4A-fungi/hnf4a_btnl_fungal_ranking_capped1e-10.tsv
+Capped plot -> Results-HNF4A-fungi/hnf4a_btnl_fungal_ranking_capped1e-10_plot.png (+ .pdf)
+
+Done.
+
+[Step 8] HNF4A + BTNL3/BTNL8 ranking of top-100 HD taxa + Candida ...
+=== HNF4A + BTNL3/BTNL8 per top-100 taxon (HD, +-4w, Kraken 2024-10) ===
+
+Loading host transcriptomics ...
+  100 host-week rows, 33052 genes
+  104 TF gene sets, 33052 background genes
+
+  40 HD species-tx (|dw|<=4) pair candidates
+  Added forced taxon S__Candida albicans (HD mean-CLR rank 3726)
+  Analysing 101 taxa (top 100 by HD mean CLR + forced)
+
+  taxa:   0%|          | 0/101 [00:00<?, ?it/s]  taxa:   8%|▊         | 8/101 [00:00<00:01, 76.96it/s]  taxa:  17%|█▋        | 17/101 [00:00<00:01, 82.04it/s]  taxa:  26%|██▌       | 26/101 [00:00<00:00, 82.14it/s]  taxa:  37%|███▋      | 37/101 [00:00<00:00, 90.87it/s]  taxa:  48%|████▊     | 48/101 [00:00<00:00, 96.33it/s]  taxa:  58%|█████▊    | 59/101 [00:00<00:00, 98.50it/s]  taxa:  69%|██████▉   | 70/101 [00:00<00:00, 99.21it/s]  taxa:  79%|███████▉  | 80/101 [00:00<00:00, 94.46it/s]  taxa:  89%|████████▉ | 90/101 [00:00<00:00, 87.26it/s]  taxa:  98%|█████████▊| 99/101 [00:01<00:00, 84.31it/s]  taxa: 100%|██████████| 101/101 [00:01<00:00, 88.91it/s]
+
+Uncapped table -> Results-HNF4A-taxa/hnf4a_btnl_taxa_ranking_top100.tsv
+
+Uncapped top 30:
+                                              Taxon mean_clr  n_samples HNF4A_pval BTNL3_r BTNL3_pval BTNL8_r BTNL8_pval combined_pval_geomean
+                             S__Lachnospira eligens   +7.211         40  2.637e-55  +0.564  1.496e-04  +0.590  6.051e-05             1.336e-21
+S__Ruminococcus bicirculans (ex Wegman et al. 2014)   +6.580         40  3.166e-52  +0.400  1.054e-02  +0.501  9.959e-04             1.492e-19
+                              S__Roseburia sp. 831b   +5.624         40  2.412e-38  +0.224  1.649e-01  +0.198  2.205e-01             9.572e-14
+                    S__Faecalibacterium sp. I4-1-79   +6.933         40  1.379e-30  +0.479  1.783e-03  +0.460  2.837e-03             1.911e-12
+                    S__Faecalibacterium sp. I3-3-33   +6.756         40  4.754e-30  +0.473  2.079e-03  +0.443  4.214e-03             3.467e-12
+                           S__Vescimonas fastidiosa   +6.037         40  3.467e-29  +0.388  1.335e-02  +0.396  1.133e-02             1.737e-11
+                            S__Bacteroides fragilis   +8.362         40  8.896e-25  +0.214  1.843e-01  +0.206  2.012e-01             3.208e-09
+                         S__Coprococcus sp. ART55/1   +5.708         40  2.316e-21  +0.327  3.916e-02  +0.307  5.388e-02             1.697e-08
+                                   S__Simiaoa sunii   +7.849         40  5.452e-19  +0.417  7.357e-03  +0.387  1.356e-02             3.789e-08
+                              S__Wujia chipingensis   +5.819         40  1.696e-20  +0.030  8.525e-01  +0.049  7.636e-01             2.227e-07
+                          S__Butyrivibrio crossotus   +5.969         40  1.180e-19  +0.141  3.850e-01  +0.146  3.688e-01             2.559e-07
+                           S__Roseburia rectibacter   +6.109         40  1.762e-14  +0.165  3.098e-01  +0.128  4.304e-01             1.329e-05
+                S__Intestinimonas butyriciproducens   +6.510         40  6.666e-12  +0.114  4.849e-01  +0.191  2.371e-01             9.151e-05
+                          S__Roseburia intestinalis   +8.460         40  1.239e-11  +0.172  2.878e-01  +0.132  4.172e-01             1.142e-04
+                                S__Candida albicans   -0.058         39  2.122e-09  +0.323  4.476e-02  +0.361  2.415e-02             1.319e-04
+                               S__Coprococcus comes   +6.371         40  7.532e-08  +0.415  7.781e-03  +0.375  1.712e-02             2.157e-04
+                               S__Roseburia hominis   +7.617         40  4.979e-10  +0.212  1.897e-01  +0.251  1.188e-01             2.239e-04
+                            S__Alistipes finegoldii   +7.552         40  5.400e-08  -0.033  8.410e-01  +0.024  8.843e-01             3.424e-03
+                        S__Bacteroides humanifaecis   +5.904         39  8.409e-08  -0.039  8.148e-01  +0.056  7.355e-01             3.694e-03
+                           S__Agathobacter rectalis   +9.568         40  5.494e-07  +0.055  7.356e-01  +0.037  8.200e-01             6.920e-03
+                        S__Odoribacter splanchnicus   +7.136         40  3.261e-02  -0.438  4.658e-03  -0.428  5.925e-03             9.655e-03
+                    S__Bacteroides thetaiotaomicron   +9.371         40  5.517e-04  +0.347  2.831e-02  +0.292  6.734e-02             1.017e-02
+                          S__Bacteroides sp. MSB163   +5.781         40  3.153e-06  -0.045  7.823e-01  -0.009  9.543e-01             1.330e-02
+                             S__Bacteroides faecium   +5.814         40  6.683e-04  -0.299  6.102e-02  -0.264  9.929e-02             1.594e-02
+                        S__Bacteroides intestinalis   +5.897         40  1.962e-01  -0.468  2.300e-03  -0.399  1.083e-02             1.697e-02
+                      S__Faecalibacterium sp. HTF-F   +6.728         40  2.934e-05  +0.127  4.337e-01  +0.094  5.659e-01             1.931e-02
+                         S__Phocaeicola coprophilus   +6.027         40  1.647e-01  -0.386  1.394e-02  -0.437  4.792e-03             2.224e-02
+                    S__Faecalibacterium sp. IP-1-18   +6.227         40  1.255e-02  +0.373  1.772e-02  +0.308  5.314e-02             2.278e-02
+                      S__uncultured Bacteroides sp.   +5.688         40  9.747e-01  -0.449  3.635e-03  -0.444  4.088e-03             2.438e-02
+                          S__Bacteroides salyersiae   +6.984         40  8.820e-05  -0.058  7.205e-01  -0.103  5.259e-01             3.221e-02
+
+Uncapped plot -> Results-HNF4A-taxa/hnf4a_btnl_taxa_ranking_top100_plot.png (+ .pdf)
+Capped table -> Results-HNF4A-taxa/hnf4a_btnl_taxa_ranking_top100_capped1e-10.tsv
+Capped plot -> Results-HNF4A-taxa/hnf4a_btnl_taxa_ranking_top100_capped1e-10_plot.png (+ .pdf)
+
+Done.
+
+=== Pipeline complete ===
+
+Outputs:
+  Results/<HD|CD|UC>/Tables/   correlations + Enrichr results
+  Results/<HD|CD|UC>/Figures/  scatter plots for genes of interest
+  Results/BTNL/                BTNL3/BTNL8 scatter + sensitivity
+  Results-HNF4A-sensitivity/   HNF4A enrichment vs. +-week window
+  Results-HNF4A-fungi/         13 curated fungi, HNF4A+BTNL3+BTNL8
+                               (uncapped + capped at p=1e-10)
+  Results-HNF4A-taxa/          top-100 HD taxa + Candida, same
+                               (uncapped + capped at p=1e-10)
+
+Every .png plot has a matching .pdf alongside it.
+See methods.txt in the root folder and in each results folder for details.

@@ -1,0 +1,168 @@
+Methods
+=======
+
+Datasets and cohort
+-------------------
+We used the Integrative Human Microbiome Project inflammatory bowel
+disease cohort (HMP2 / IBDMDB, SRA BioProject PRJNA398089), which
+provides longitudinal stool shotgun metagenomics and matched host
+transcriptomics from Crohn's disease (CD), ulcerative colitis (UC)
+and non-IBD control (HD) participants. Stool metagenomes were
+profiled against the Kraken Plus PFP (2024-10) reference database
+(Langmead lab prebuilt index, https://benlangmead.github.io/aws-
+indexes/k2); species-level abundances were centred-log-ratio (CLR)
+transformed (zeros treated as missing) to produce a Run x species
+table of 17,031 species. Host mucosal transcript counts (biopsy
+RNA-seq) were restricted to genes successfully cross-referenced to
+current HGNC symbols via mygene.info (https://mygene.info; a
+BioThings client over the Ensembl / NCBI Entrez / UniProt gene
+universe), querying the "symbol" and "alias" fields against
+species = human; version suffixes were stripped prior to the
+lookup. Genes with no mygene.info hit (typically retired symbols
+or non-standard identifiers) were dropped, yielding 33,052
+background genes. All non-IBD participants are
+reported below as "healthy donors" (HD).
+
+Sample aggregation and temporal matching
+----------------------------------------
+Metagenomic and transcriptomic samples are collected on different
+schedules, and some participant-week combinations have multiple
+runs. For each modality we averaged replicate runs within a
+(participant, week) cell and indexed rows by the composite key
+host_week = participant x week. Transcriptomic rows were
+additionally scaled to row-sum-1 relative abundance.
+
+For each taxon-gene pair, we window-matched metagenomics and
+transcriptomics: a metagenomic row at (participant p, week w_mgx)
+was paired with every transcriptomic row of the same participant at
+week w_tx satisfying |w_mgx - w_tx| <= 4. All eligible pairs were
+retained (no deduplication), so participants with several nearby
+visits contribute multiple paired observations. All downstream
+analyses were then restricted to diagnosis == HD unless stated
+otherwise.
+
+Per-taxon gene-wise correlations
+--------------------------------
+For a given species T, let y denote the vector of CLR values across
+the n window-matched HD host_week pairs and X denote the matching
+(n x 33,052) matrix of host-gene relative-abundance values. Pearson
+correlation coefficients r_j and two-sided t-test p-values p_j were
+computed for every gene j simultaneously using a single numpy matmul
+(implemented in hnf4a_btnl_taxa_ranking.py); scipy.stats.linregress
+was used in the equivalent but slower per-gene loops in
+correlate_candida_genes.py and hnf4a_btnl_fungal_ranking.py,
+producing identical results where comparable. Correlations between
+Candida albicans CLR and individual genes of interest (BTNL3, BTNL8,
+and genes highlighted in downstream enrichments) were additionally
+visualised as scatter plots (Results/<diagnosis>/Figures,
+Results/BTNL/Figures).
+
+Transcription-factor and GO enrichment
+--------------------------------------
+Enrichment was performed against gene-set libraries from the Ma'ayan
+Lab Enrichr resource (Chen et al., BMC Bioinformatics 2013; Kuleshov
+et al., Nucleic Acids Research 2016; Xie et al., Current Protocols
+2021; https://maayanlab.cloud/Enrichr). The TF library was
+ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X, a consensus call of
+ChIP-seq / ChIP-chip target sets merged from the ENCODE and ChEA
+projects. Gene Ontology was represented by the 2023 releases of
+GO_Biological_Process_2023, GO_Molecular_Function_2023 and
+GO_Cellular_Component_2023. All four libraries were downloaded as
+GMT flat files from the Enrichr "Libraries" endpoint and are bundled
+under Data/ so that enrichment is computed locally.
+
+For each taxon T, the query gene set for TF enrichment consisted of
+host genes positively correlated with T at uncorrected Pearson
+p < 0.05 (r > 0); for GO we used the analogous negatively correlated
+set. One-sided Fisher's exact tests (alternative = "greater") were
+computed for every gene set in the corresponding library against
+the 33,052-gene background. Enrichment p-values were corrected
+within library by the Benjamini-Hochberg procedure. The focal
+result used downstream is the "HNF4A ENCODE" gene set's raw Fisher
+p-value (HNF4A_pval).
+
+Week-window sensitivity
+-----------------------
+To confirm that the HNF4A enrichment signal around Candida albicans
+is not an artefact of the +-4-week matching window, the full
+correlate-then-enrich pipeline was rerun for matching windows from
++-1 to +-52 weeks in HD, CD and UC separately
+(hnf4a_week_sensitivity.py). The -log10 of the HNF4A ENCODE p-value
+and its BH-adjusted p-value are plotted as a function of window size
+for each diagnosis (Results-HNF4A-sensitivity/).
+
+Species panels
+--------------
+Two complementary species panels were interrogated with the same
+combined scoring framework.
+
+(i) Curated prevalent fungal panel (n = 13). Of 75 species with
+genus-level match to fungal genera that exceed HMP2 prevalence > 0.5,
+62 were excluded as implausible gut colonisers: plant pathogens
+(e.g. Puccinia triticina, Fusarium graminearum, Botrytis cinerea,
+Zymoseptoria tritici, Ustilago maydis, Colletotrichum spp.);
+wine-, beer-, dairy- or biotech-industry yeasts (e.g. Saccharomyces
+paradoxus, Brettanomyces bruxellensis, Kluyveromyces lactis,
+Komagataella phaffii, Yarrowia lipolytica); soil or lab-model
+filamentous fungi (e.g. Neurospora crassa, Aspergillus nidulans,
+Trichoderma spp., Metarhizium brunneum, Talaromyces marneffei); and
+species whose high prevalence in stool is inconsistent with their
+known ecology (e.g. Coccidioides posadasii, Malassezia
+vespertilionis). The remaining 13 correspond to well-established
+human skin (Malassezia restricta, M. japonica), gastrointestinal and
+oral commensal or transient yeasts (Saccharomyces cerevisiae,
+Candida albicans, C. dubliniensis, C. orthopsilosis, Nakaseomyces
+glabratus, Debaryomyces hansenii, Pichia kudriavzevii, Lodderomyces
+elongisporus, L. beijingensis) and clinically relevant opportunists
+(Aspergillus fumigatus, Cryptococcus neoformans).
+
+(ii) Top-100 HD-abundance panel plus Candida albicans. Species were
+ranked by mean CLR across HD host_week rows; the top 100 were
+retained, and C. albicans was force-included (HD mean-CLR rank
+3,726), yielding a 101-taxon panel.
+
+Combined three-signal score
+---------------------------
+For each species we recorded three p-values: HNF4A_pval (Fisher
+enrichment of HNF4A ENCODE targets among positively correlated host
+genes), BTNL3_pval and BTNL8_pval (two-sided Pearson tests for the
+direct regression of BTNL3 and BTNL8 expression against the taxon's
+CLR). A single composite score per taxon was computed as the
+geometric mean of these three p-values, evaluated in log space:
+   combined = exp( mean_i { log( max(p_i, 1e-300) ) } ).
+Taxa were ranked ascending by this score.
+
+Because Fisher's exact test can return HNF4A p-values as small as
+1e-55 for abundant Firmicutes, a single extreme hit can dominate the
+geometric mean. As a complementary ranking that foregrounds taxa
+whose three signals are *jointly* strong rather than those with a
+single extreme HNF4A hit, we additionally computed the same
+geometric mean after capping every input p-value at a floor of
+1e-10:
+   p'_i     = max(p_i, 1e-10)
+   combined_capped = exp( mean_i { log( p'_i ) } ).
+Both the uncapped and capped rankings are reported for both species
+panels (Results-HNF4A-fungi/ and Results-HNF4A-taxa/).
+
+Visualisation
+-------------
+Per-taxon bar plots of -log10(combined score) were produced with
+matplotlib, with Candida albicans highlighted in red and a dashed
+reference line at p = 0.05. Scatter plots for individual
+gene-taxon regressions use a least-squares overlay. All figures are
+saved in both raster (.png, 200 dpi) and vector (.pdf) form via a
+shared helper (_figutil.save_fig).
+
+Software and reproducibility
+----------------------------
+The entire pipeline is orchestrated by runme.sh and uses Python 3
+with pandas, numpy, scipy, matplotlib and tqdm. Enrichr gene-set
+libraries are bundled under Data/ so that enrichment runs offline.
+The mygene.info gene-annotation lookup in step 1 caches its result
+to Data/gene_annotations.tsv; once that cache exists the pipeline
+runs with no network access at all. Committing the cached
+annotation table alongside the code therefore makes the repository
+fully self-contained. Per-folder methods files
+(Results-HNF4A-fungi/methods.txt, Results-HNF4A-taxa/methods.txt)
+document the outputs of each analysis module; this file gives the
+overall description of the pipeline.

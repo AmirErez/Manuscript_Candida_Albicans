@@ -1,0 +1,175 @@
+Results-HNF4A-fungi — methods
+=============================
+
+Goal
+----
+Across a curated list of prevalent human-associated fungal species,
+quantify how each species' CLR abundance tracks three features of the
+host intestinal transcriptome:
+  1. HNF4A transcription-factor activity (Fisher's exact enrichment
+     of the ENCODE HNF4A target set among host genes positively
+     correlated with the fungal CLR).
+  2. BTNL3 expression (direct Pearson correlation vs. fungal CLR).
+  3. BTNL8 expression (direct Pearson correlation vs. fungal CLR).
+
+Kraken Plus PFP (2024-10) reference only, healthy donors only
+(HD + nonIBD merged), sample pairs matched within +-4 weeks per
+participant. The "HNF4A ENCODE" target set is taken from the
+ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X library of the Ma'ayan
+Lab Enrichr resource (https://maayanlab.cloud/Enrichr).
+
+Fungal species selection
+------------------------
+In the Kraken 2024-10 species table there are 75 species with
+genus-level match to fungal genera that have prevalence > 0.5 across
+HMP2 metagenomics samples.  Of these, many have no plausible
+explanation for being detected at >70% prevalence in human stool and
+are almost certainly cross-kingdom Kraken misassignments (ITS-like or
+low-complexity reads matched against sparsely-populated fungal
+references) or environmental DNA contaminants.
+
+We therefore curated the list down to 13 species that are either
+well-established human commensals (skin, oral, or GI), or clinically
+relevant human opportunists.  The curated 13 are:
+
+  Skin commensals
+    Malassezia restricta          (prev 0.992)
+    Malassezia japonica           (prev 0.814)
+
+  Gut / oral commensals and yeasts
+    Saccharomyces cerevisiae      (prev 0.939)
+    Candida albicans              (prev 0.869)
+    Candida dubliniensis          (prev 0.868)
+    Nakaseomyces glabratus        (prev 0.784)  [formerly C. glabrata]
+    Debaryomyces hansenii         (prev 0.779)
+    Candida orthopsilosis         (prev 0.778)
+    Pichia kudriavzevii           (prev 0.775)  [= C. krusei]
+    Lodderomyces elongisporus     (prev 0.844)
+    Lodderomyces beijingensis     (prev 0.758)
+
+  Clinically relevant human opportunists
+    Aspergillus fumigatus         (prev 0.850)
+    Cryptococcus neoformans       (prev 0.846)
+
+Excluded categories (62 species)
+--------------------------------
+1. Plant pathogens / phytopathogens
+   - Puccinia triticina, P. striiformis (wheat rusts)
+   - Zymoseptoria tritici (wheat septoria)
+   - Botrytis cinerea (grey mold)
+   - Fusarium oxysporum, F. poae, F. graminearum, F. keratoplasticum,
+     F. fujikuroi, F. falciforme, F. pseudograminearum,
+     F. verticillioides, F. musae (crop pathogens)
+   - Colletotrichum lupini, C. higginsianum, C. destructivum
+     (anthracnose)
+   - Ustilago maydis, Sporisorium graminicola (smuts)
+   All detected at 0.51–0.96 prevalence in HD stool, which is not
+   biologically plausible: these organisms live on/in plants.
+
+2. Lab / industrial / wine and beer yeasts
+   - Saccharomyces mikatae, S. paradoxus, S. kudriavzevii,
+     S. eubayanus  (wild / wine Saccharomyces sensu stricto)
+   - Schizosaccharomyces pombe, S. osmophilus  (fission yeast)
+   - Yarrowia lipolytica (industrial oleaginous yeast)
+   - Zygosaccharomyces rouxii (food spoilage)
+   - Brettanomyces bruxellensis, B. nanus (wine/beer spoilage)
+   - Torulaspora globosa, T. delbrueckii (fermentation)
+   - Kazachstania africana (food ferment)
+   - Lachancea thermotolerans (wine)
+   - Kluyveromyces marxianus, K. lactis (dairy)
+   - Tetrapisispora phaffii (wine)
+   - Komagataella phaffii (protein expression host, = Pichia pastoris)
+   - Ogataea parapolymorpha (industrial methylotroph)
+   - Scheffersomyces stipitis (industrial xylose fermentation)
+   - Eremothecium gossypii, E. cymbalariae, E. sinecaudum (cotton
+     pathogens / riboflavin industry)
+
+3. Soil / environmental / lab-model filamentous fungi
+   - Neurospora crassa, Sordaria macrospora (lab genetics models)
+   - Aspergillus nidulans (lab model), A. chevalieri, A. luchuensis,
+     A. puulaauensis (environmental)
+   - Penicillium oxalicum, P. digitatum (citrus spoilage)
+   - Trichoderma breve, T. atroviride, T. asperellum (soil biocontrol)
+   - Metarhizium brunneum (insect biocontrol)
+   - Talaromyces rugulosus, T. marneffei (tropical / environmental)
+   - Sugiyamaella lignohabitans (wood-rotting)
+   - Cutaneotrichosporon cavernicola (cave fungus)
+   - Podospora bellae-mahoneyi (dung fungus, lab model)
+
+4. Almost certainly mis-assigned or non-human-host
+   - Coccidioides posadasii (restricted-geography soil dimorph; its
+     detection at 0.84 prevalence in Boston/Cleveland HMP2 samples is
+     implausible)
+   - Malassezia vespertilionis (bat-associated Malassezia)
+   - Cryptococcus depauperatus, C. tetragattii (environmental /
+     tropical tree-associated)
+
+Many of these are flagged by the same pattern: very high prevalence
+in HD stool combined with a known non-human host or environment.
+This is consistent with Kraken 2024-10's behaviour on samples where
+the "true" organism has no close reference in the kingdom — k-mers
+promiscuously match the nearest available genome — plus low-level
+environmental DNA contamination.
+
+Preprocessing and per-taxon analysis
+------------------------------------
+Identical to Results-HNF4A-taxa/methods.txt and the root
+Manuscript_Candida_Albicans/methods.txt:
+
+  - host transcriptomics averaged per (participant, week), normalised
+    to row-sum-1 relative abundance
+  - species CLR averaged per (participant, week), nonIBD merged into HD
+  - window-matched pairs at |week_mgx - week_tx| <= 4, HD only
+  - per-taxon Pearson (r, p) over all 33,052 host genes
+  - HNF4A_pval = one-sided Fisher's exact for overlap of the
+    "HNF4A ENCODE" target set with the set of genes at p < 0.05 and
+    r > 0 (background = all filtered host genes, N = 33,052)
+  - BTNL3_pval, BTNL8_pval read directly out of the per-gene table
+  - combined_pval_geomean = exp( mean( log( p_i ) ) ) with a 1e-300
+    underflow floor
+
+Capped ranking
+--------------
+Because Fisher's exact can return p-values as low as 1e-55 for
+species like Candida dubliniensis, the uncapped geometric mean is
+dominated by a single HNF4A hit.  To compare taxa on whether ALL three
+signals are jointly strong, we additionally cap every input p at a
+floor of 1e-10 before taking the geometric mean:
+     p_capped = max(p, 1e-10)
+     combined_capped = exp( mean( log(p_capped) ) )
+
+Files
+-----
+  hnf4a_btnl_fungal_ranking.tsv
+      13 curated fungi, sorted by uncapped combined_pval_geomean.
+
+  hnf4a_btnl_fungal_ranking_plot.png / .pdf
+      Horizontal bar plot of -log10(combined_pval_geomean), Candida
+      albicans highlighted in red.
+
+  hnf4a_btnl_fungal_ranking_capped1e-10.tsv
+      Same 13 fungi, with extra columns combined_pval_geomean_capped
+      and neg_log10_combined_capped.  Sorted by the capped score.
+
+  hnf4a_btnl_fungal_ranking_capped1e-10_plot.png / .pdf
+      Capped bar plot; Candida in red.
+
+  methods.txt
+      This file.
+
+Key parameters
+--------------
+  NUM_WEEKS        = 4
+  DIAGNOSIS        = "HD" (nonIBD merged into HD)
+  CORR_P_THRESHOLD = 0.05
+  TF_OF_INTEREST   = "HNF4A ENCODE"
+  BTNL_GENES       = BTNL3, BTNL8
+  P-value cap      = 1e-10 (capped tables only)
+  Reference        = Kraken Plus PFP (2024-10)
+  Enrichr library  = ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X
+                     (Ma'ayan Lab, https://maayanlab.cloud/Enrichr)
+
+Generating script
+-----------------
+  hnf4a_btnl_fungal_ranking.py    (in Manuscript_Candida_Albicans/)
+  Uncapped and capped outputs are produced in the same run.
