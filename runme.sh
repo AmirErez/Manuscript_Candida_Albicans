@@ -7,6 +7,9 @@
 #   Step 2  Per-diagnosis Candida vs. host-gene correlations
 #   Step 3  ENCODE/ChEA TF enrichment on positively correlated genes
 #   Step 4  GO (BP / MF / CC) enrichment on negatively correlated genes
+#   Step 4b Figure 5C/E/F (HD): GO BP on positively correlated genes,
+#           Reactome 2022 and PhenGenI 2021 on negatively correlated
+#           genes, plus panel plots  (run_figure5_enrichments.sh)
 #   Step 5  BTNL3 / BTNL8 direct analysis (scatter + week sensitivity)
 #   Step 6  HNF4A ENCODE enrichment sensitivity to the +-week window
 #   Step 7  HNF4A + BTNL3/BTNL8 combined ranking of 13 curated prevalent
@@ -26,9 +29,12 @@
 #     hmp2_metadata_2018-08-20.csv
 #     host_tx_counts.tsv
 #     ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X.gmt
-#     GO_Biological_Process_2023.gmt
-#     GO_Molecular_Function_2023.gmt
-#     GO_Cellular_Component_2023.gmt
+#     GO_Biological_Process_2026.gmt
+#     GO_Molecular_Function_2026.gmt
+#     GO_Cellular_Component_2026.gmt
+#     Reactome_2022.gmt
+#     PhenGenI_Association_2021.gmt
+#     enrichr_library_manifest.tsv
 #   Python with: pandas, numpy, scipy, matplotlib, tqdm
 
 set -euo pipefail
@@ -110,9 +116,9 @@ echo ""
 # Step 4: GO enrichment (negatively correlated genes)
 # ---------------------------------------------------------------------------
 GO_LIBRARIES=(
-    "GO_Biological_Process_2023"
-    "GO_Molecular_Function_2023"
-    "GO_Cellular_Component_2023"
+    "GO_Biological_Process_2026"
+    "GO_Molecular_Function_2026"
+    "GO_Cellular_Component_2026"
 )
 GO_TAGS=(
     "GO_BP"
@@ -137,6 +143,13 @@ for i in "${!GO_LIBRARIES[@]}"; do
             --background "${BACKGROUND}"
     done
 done
+echo ""
+
+# ---------------------------------------------------------------------------
+# Step 4b: Figure 5C/E/F enrichments (HD) + panel plots
+# ---------------------------------------------------------------------------
+echo "[Step 4b] Figure 5 enrichments (HD: GO BP pos, Reactome neg, PhenGenI neg) ..."
+bash run_figure5_enrichments.sh
 echo ""
 
 # ---------------------------------------------------------------------------

@@ -2,12 +2,30 @@
 """
 enrichr_enrichment.py
 
-Local Fisher's exact test enrichment against any Enrichr gene set library.
+Local Fisher's exact test enrichment against any Enrichr gene set library,
+computed the way the Enrichr website computes it when a background gene
+list is supplied.
 
 Downloads the GMT file from Enrichr on first run (cached locally in Data/).
 Runs enrichment for each diagnosis, using genes with p < threshold and
 selected correlation sign as the query set, and the full filtered gene list
-(~30K) as background.
+(~33K) as background.
+
+Enrichr conventions reproduced here (checked term by term against an Enrichr
+web run with the same query and background list: overlaps and set sizes
+identical; p-value, adjusted p-value, odds ratio and combined score equal to
+within 1e-13 relative):
+  - gene symbols are matched case-insensitively (upper-cased) in the query,
+    the background and the library;
+  - each gene set is restricted to the background genes; the query size is
+    the number of query genes;
+  - the one-sided (right-tailed) Fisher's exact p-value is computed as in
+    Enrichr's FastFisher.getRightTailedP, including its approximation of
+    exp(x) by (1 + x/2^20)^(2^20)
+    (github.com/MaayanLab/enrichmentAPI, src/main/java/math/FastFisher.java);
+  - odds ratio = a*d / (b*c); combined score = -ln(p) * odds ratio;
+  - only terms with at least one overlapping gene are reported, and the
+    Benjamini-Hochberg correction runs over those terms.
 
 Outputs a table per condition with: Name, p-value, adjusted p-value (BH),
 odds ratio, combined score, and overlapping genes.
@@ -17,17 +35,17 @@ Usage
   python enrichr_enrichment.py --library "ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X" \
       --diagnoses HD --corr-sign pos --p-threshold 0.05
 
-  python enrichr_enrichment.py --library "GO_Biological_Process_2023" \
+  python enrichr_enrichment.py --library "GO_Biological_Process_2026" \
       --corr-sign neg --p-threshold 0.05
 """
 
 import argparse
+import math
 import os
 import urllib.request
 
 import numpy as np
 import pandas as pd
-from scipy.stats import fisher_exact
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -64,75 +82,111 @@ def download_gmt(library: str) -> str:
 
 
 def parse_gmt(path: str) -> dict[str, set[str]]:
-    """Parse GMT file into {set_name: {gene1, gene2, ...}}."""
+    """Parse GMT file into {set_name: {GENE1, GENE2, ...}} (upper-cased)."""
     gene_sets = {}
     with open(path) as f:
         for line in f:
             parts = line.rstrip("\n").split("\t")
             name = parts[0]
-            genes = {g.strip() for g in parts[2:] if g.strip()}
+            genes = {g.strip().upper() for g in parts[2:] if g.strip()}
             if genes:
                 gene_sets[name] = genes
     return gene_sets
 
 
 def load_background_genes(path: str) -> set[str]:
-    """Load gene names from filtered transcript counts (genes are rows)."""
+    """Load gene names from filtered transcript counts (genes are rows),
+    upper-cased as Enrichr does."""
     df = pd.read_csv(path, sep="\t", usecols=[0])
-    return set(df.iloc[:, 0])
+    return set(df.iloc[:, 0].astype(str).str.upper())
 
 
 def load_query_genes(results_path: str, p_thresh: float,
                      corr_sign: str) -> set[str]:
-    """Load significant genes from correlation results."""
+    """Load significant genes from correlation results (upper-cased)."""
     df = pd.read_csv(results_path, sep="\t")
     mask = df["P_value"] < p_thresh
     if corr_sign == "pos":
         mask &= df["Correlation"] > 0
     elif corr_sign == "neg":
         mask &= df["Correlation"] < 0
-    return set(df.loc[mask, "Gene"])
+    return set(df.loc[mask, "Gene"].astype(str).str.upper())
+
+
+def log_factorials(n_max: int) -> list[float]:
+    """ln(i!) for i = 0..n_max, accumulated term by term as in Enrichr."""
+    f = [0.0]
+    for i in range(1, n_max + 1):
+        f.append(f[-1] + math.log(i))
+    return f
+
+
+def exp20(x: float) -> float:
+    """Enrichr's approximation of exp(x): (1 + x/2^20)^(2^20)."""
+    x = 1.0 + x / 1048576
+    for _ in range(20):
+        x *= x
+    return x
+
+
+def enrichr_right_tailed_p(a: int, b: int, c: int, d: int,
+                           f: list[float]) -> float:
+    """Right-tailed Fisher's exact p-value, as Enrichr's
+    FastFisher.getRightTailedP(a, b, c, d); f = log_factorials(a+b+c+d)."""
+    same = f[a + b] + f[c + d] + f[a + c] + f[b + d] - f[a + b + c + d]
+    p = exp20(same - (f[a] + f[b] + f[c] + f[d]))
+    for _ in range(min(b, c)):
+        a += 1
+        b -= 1
+        c -= 1
+        d += 1
+        p += exp20(same - (f[a] + f[b] + f[c] + f[d]))
+    return p
 
 
 def enrichment_test(query: set[str], background: set[str],
                     gene_sets: dict[str, set[str]]) -> pd.DataFrame:
     """
-    Fisher's exact test for each gene set.
+    Enrichr's Fisher's exact test for each gene set.
 
-    For each gene set:
+    For each gene set, restricted to the background:
       a = query AND set  (overlap)
-      b = query NOT set
-      c = set NOT query  (in background)
+      b = set NOT query
+      c = query NOT set
       d = background NOT query NOT set
+
+    Terms with no overlapping gene are not reported and do not count
+    towards the Benjamini-Hochberg correction (as in Enrichr).
     """
     N = len(background)
-    k = len(query & background)
+    n = len(query)
+    f = log_factorials(N)
 
     results = []
     for name, gs in gene_sets.items():
         gs_bg = gs & background
         overlap = query & gs_bg
         a = len(overlap)
-        b = k - a
-        c = len(gs_bg) - a
-        d = N - a - b - c
-
         if a == 0:
-            results.append({
-                "Name": name, "P_value": 1.0, "Odds_ratio": 0.0,
-                "Combined_score": 0.0, "Overlap_count": 0,
-                "Set_size": len(gs_bg), "Overlap_genes": "",
-            })
             continue
+        b = len(gs_bg) - a
+        c = n - a
+        d = N - n - len(gs_bg) + a
 
-        odds, pval = fisher_exact([[a, b], [c, d]], alternative="greater")
+        pval = enrichr_right_tailed_p(a, b, c, d, f)
+        odds = a * d / (b * c) if b * c > 0 else math.inf
+        combined = -math.log(pval) * odds if pval > 0 else math.inf
         results.append({
             "Name": name, "P_value": pval, "Odds_ratio": odds,
-            "Combined_score": 0.0, "Overlap_count": a,
+            "Combined_score": combined, "Overlap_count": a,
             "Set_size": len(gs_bg), "Overlap_genes": ";".join(sorted(overlap)),
         })
 
-    df = pd.DataFrame(results).sort_values("P_value")
+    columns = ["Name", "P_value", "Adjusted_p_value", "Odds_ratio",
+               "Combined_score", "Overlap_count", "Set_size", "Overlap_genes"]
+    df = pd.DataFrame(results, columns=[c for c in columns
+                                        if c != "Adjusted_p_value"])
+    df = df.sort_values(["P_value", "Name"], kind="mergesort")
 
     n_tests = len(df)
     ranks = np.arange(1, n_tests + 1)
@@ -142,15 +196,7 @@ def enrichment_test(query: set[str], background: set[str],
         adj[i] = min(adj[i], adj[i + 1])
     df["Adjusted_p_value"] = adj
 
-    with np.errstate(divide="ignore", invalid="ignore"):
-        log_p = -np.log(np.clip(df["P_value"].values, 1e-300, 1.0))
-        log_or = np.log(np.clip(df["Odds_ratio"].values, 1e-300, None))
-        df["Combined_score"] = log_p * log_or
-    df["Combined_score"] = df["Combined_score"].replace([np.inf, -np.inf], 0.0)
-
-    df = df[["Name", "P_value", "Adjusted_p_value", "Odds_ratio",
-             "Combined_score", "Overlap_count", "Set_size", "Overlap_genes"]]
-    return df.sort_values("P_value").reset_index(drop=True)
+    return df[columns].reset_index(drop=True)
 
 
 # ---------------------------------------------------------------------------
@@ -161,7 +207,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Local enrichment (any Enrichr library) on Candida-correlated genes.")
     parser.add_argument("--library", required=True,
-                        help="Enrichr library name (e.g. GO_Biological_Process_2023)")
+                        help="Enrichr library name (e.g. GO_Biological_Process_2026)")
     parser.add_argument("--output-tag", default=None,
                         help="Short tag for output filename (default: derived from library)")
     parser.add_argument("--diagnoses", nargs="+", default=DIAGNOSES,
@@ -186,7 +232,7 @@ def main():
 
     print(f"Loading background genes from {args.background} ...")
     background = load_background_genes(args.background)
-    print(f"  {len(background)} background genes")
+    print(f"  {len(background)} background genes (case-insensitive unique)")
 
     suffix = f"pm{args.num_weeks}_weeks"
     for diag in args.diagnoses:
@@ -214,7 +260,8 @@ def main():
         enrichment.to_csv(out_path, sep="\t", index=False)
 
         sig = enrichment[enrichment["Adjusted_p_value"] < 0.05]
-        print(f"  {len(sig)} terms significant (adj. p < 0.05)")
+        print(f"  {len(enrichment)} terms with >=1 overlapping gene; "
+              f"{len(sig)} significant (adj. p < 0.05)")
         if len(sig) > 0:
             print(sig[["Name", "P_value", "Adjusted_p_value",
                        "Odds_ratio", "Combined_score"]].head(15)

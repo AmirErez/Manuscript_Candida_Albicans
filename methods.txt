@@ -65,21 +65,61 @@ et al., Nucleic Acids Research 2016; Xie et al., Current Protocols
 2021; https://maayanlab.cloud/Enrichr). The TF library was
 ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X, a consensus call of
 ChIP-seq / ChIP-chip target sets merged from the ENCODE and ChEA
-projects. Gene Ontology was represented by the 2023 releases of
-GO_Biological_Process_2023, GO_Molecular_Function_2023 and
-GO_Cellular_Component_2023. All four libraries were downloaded as
-GMT flat files from the Enrichr "Libraries" endpoint and are bundled
-under Data/ so that enrichment is computed locally.
+projects. Gene Ontology was represented by the 2026 releases
+GO_Biological_Process_2026, GO_Molecular_Function_2026 and
+GO_Cellular_Component_2026 (5,954, 1,394 and 510 gene sets), the
+releases served by Enrichr at the time of analysis. All libraries
+were downloaded as GMT flat files from the Enrichr "Libraries"
+endpoint and are bundled under Data/ so that enrichment is computed
+locally; the GO 2026 files were downloaded on 26 September 2026.
 
-For each taxon T, the query gene set for TF enrichment consisted of
-host genes positively correlated with T at uncorrected Pearson
-p < 0.05 (r > 0); for GO we used the analogous negatively correlated
-set. One-sided Fisher's exact tests (alternative = "greater") were
-computed for every gene set in the corresponding library against
-the 33,052-gene background. Enrichment p-values were corrected
-within library by the Benjamini-Hochberg procedure. The focal
-result used downstream is the "HNF4A ENCODE" gene set's raw Fisher
-p-value (HNF4A_pval).
+For Candida albicans in each diagnosis group, the query gene set for
+TF enrichment consisted of host genes positively correlated with
+C. albicans at uncorrected Pearson p < 0.05 (r > 0); for GO we used
+the analogous negatively correlated set. These enrichments were
+computed so as to reproduce Enrichr's analysis with a user-supplied
+background list exactly (enrichr_enrichment.py). Gene symbols were
+matched case-insensitively (upper-cased) in the query, the background
+and the library, so the 33,052-transcript background comprises 33,048
+unique symbols. Each gene set was restricted to the background, and a
+one-sided (right-tailed) Fisher's exact test was computed as in
+Enrichr's implementation (FastFisher, MaayanLab/enrichmentAPI),
+including its approximation of the exponential function (relative
+difference from the exact Fisher p-value < 0.1%). Odds ratios were
+computed as ad/bc and combined scores as -ln(p) x odds ratio. As in
+Enrichr, only gene sets sharing at least one gene with the query are
+reported, and p-values were corrected by the Benjamini-Hochberg
+procedure across those gene sets within each library. On the Figure 5C
+query this procedure reproduced an Enrichr web analysis term by term
+(overlaps and gene-set sizes identical; p-values, adjusted p-values,
+odds ratios and combined scores equal to within 1e-13 relative) when
+given the same background list.
+
+For the taxon and week-window scans (hnf4a_week_sensitivity.py,
+hnf4a_btnl_fungal_ranking.py, hnf4a_btnl_taxa_ranking.py), the query
+gene set for each taxon T and window was defined in the same way,
+and one-sided Fisher's exact tests (alternative = "greater"; SciPy)
+were computed against the same background, with gene symbols matched
+exactly as written. The focal result used downstream is the
+"HNF4A ENCODE" gene set's raw Fisher p-value (HNF4A_pval); in the
+week-window analysis it was additionally Benjamini-Hochberg corrected
+across all gene sets in the library.
+
+For Figure 5C, 5E and 5F, three further enrichments were computed for
+Candida albicans in HD only, from the same +-4-week correlation
+table: GO_Biological_Process_2026 was tested among positively
+correlated transcripts, whereas Reactome_2022 and
+PhenGenI_Association_2021 were tested among negatively correlated
+transcripts (uncorrected Pearson p < 0.05 in each case), using the
+Enrichr-equivalent procedure described above. Reactome_2022 and
+PhenGenI_Association_2021 were downloaded as GMT files from the
+Enrichr endpoint on 26 September 2026 and bundled under Data/; the
+three libraries contain 5,954, 1,818 and 950 gene sets, respectively,
+and their URLs, download dates and SHA-256 checksums are recorded in
+Data/enrichr_library_manifest.tsv. For each panel, the ten terms with
+the smallest BH-adjusted p-values (ties broken by raw p-value, then
+term name) are plotted as -log10(adjusted p-value)
+(run_figure5_enrichments.sh, plot_figure5_enrichment_panels.py).
 
 Week-window sensitivity
 -----------------------

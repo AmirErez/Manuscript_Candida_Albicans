@@ -40,16 +40,26 @@ top-100 most abundant HD taxa plus a forced *C. albicans*).
   Ensembl / NCBI Entrez / UniProt / HGNC) to retain only rows that
   match a known human gene symbol or alias; ~33,052 genes survive
   and form the background for every enrichment test.
-- **Gene-set libraries:** four GMT files from the Ma'ayan Lab
+- **Gene-set libraries:** six GMT files from the Ma'ayan Lab
   [Enrichr](https://maayanlab.cloud/Enrichr) resource, bundled under
   `Data/`:
   - `ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X.gmt` — consensus
     ChIP-seq / ChIP-chip targets merged from ENCODE and ChEA; used
     for transcription-factor enrichment.
-  - `GO_Biological_Process_2023.gmt`,
-    `GO_Molecular_Function_2023.gmt`,
-    `GO_Cellular_Component_2023.gmt` — 2023 release of the GO
-    namespaces, used for negative-correlation enrichment.
+  - `GO_Biological_Process_2026.gmt`,
+    `GO_Molecular_Function_2026.gmt`,
+    `GO_Cellular_Component_2026.gmt` — 2026 release of the GO
+    namespaces (the release Enrichr serves), used for the
+    negative-correlation enrichment (Step 4) and Figure 5C (Step 4b).
+    The previous `GO_*_2023.gmt` files are still in `Data/` but are no
+    longer used.
+  - `Reactome_2022.gmt`, `PhenGenI_Association_2021.gmt` — Reactome
+    pathways and PhenGenI GWAS trait/disease associations, used for the
+    Figure 5E / 5F negative-correlation enrichments (Step 4b).
+  - `enrichr_library_manifest.tsv` records the download URL, date,
+    parsed term count and SHA-256 of the GO 2026, Reactome and PhenGenI
+    libraries (GO BP 5,954; GO MF 1,394; GO CC 510; Reactome 1,818;
+    PhenGenI 950 terms).
 
 ---
 
@@ -69,14 +79,19 @@ Manuscript_Candida_Albicans/
 │   ├── host_tx_counts_filtered.tsv      # mygene.info-filtered counts (33,052 genes)
 │   ├── gene_annotations.tsv             # cached mygene.info annotation table
 │   ├── ENCODE_and_ChEA_Consensus_TFs_from_ChIP-X.gmt
-│   ├── GO_Biological_Process_2023.gmt
-│   ├── GO_Cellular_Component_2023.gmt
-│   └── GO_Molecular_Function_2023.gmt
+│   ├── GO_Biological_Process_2026.gmt
+│   ├── GO_Cellular_Component_2026.gmt
+│   ├── GO_Molecular_Function_2026.gmt
+│   ├── Reactome_2022.gmt
+│   ├── PhenGenI_Association_2021.gmt
+│   └── enrichr_library_manifest.tsv     # provenance of the GO / Reactome / PhenGenI libraries
 │
 ├── _figutil.py                      # helper: save every plot as .png + .pdf
 ├── filter_known_genes.py            # Step 1 — mygene.info filter / cache
 ├── correlate_candida_genes.py       # Step 2 — Candida vs. gene Pearson, per diagnosis
 ├── enrichr_enrichment.py            # Steps 3–4 — TF + GO enrichment
+├── run_figure5_enrichments.sh       # Step 4b — Figure 5C/E/F enrichments + plots
+├── plot_figure5_enrichment_panels.py  # Step 4b — Figure 5C/E/F bar plots
 ├── btnl_analysis.py                 # Step 5 — BTNL3 / BTNL8 direct analysis
 ├── hnf4a_week_sensitivity.py        # Step 6 — HNF4A enrichment vs. ±week window
 ├── hnf4a_btnl_fungal_ranking.py     # Step 7 — 13-fungi combined ranking
@@ -150,8 +165,9 @@ bash runme.sh 2>&1 | tee runme.log
 |------|-------------------------------------|------------------|
 | 1    | `filter_known_genes.py`             | `Data/host_tx_counts_filtered.tsv` (restricted to 33 k known human genes) and `Data/gene_annotations.tsv` (the mygene.info cache). Skipped if the filtered file already exists. |
 | 2    | `correlate_candida_genes.py`        | Per-diagnosis Pearson `r`, slope and *p*-value of every host gene vs. *C. albicans* CLR, plus scatter plots for a curated gene panel (TLR / IL / NOD2 / HNF4A / HNF4G). Results under `Results/{HD,CD,UC}/`. |
-| 3    | `enrichr_enrichment.py` (TF)        | Fisher's-exact TF enrichment of the ENCODE_and_ChEA_Consensus library against host genes *positively* correlated with *C. albicans* at `p < 0.05`, per diagnosis. |
-| 4    | `enrichr_enrichment.py` (GO BP/MF/CC)| Same, for the three 2023 GO namespaces, on *negatively* correlated genes. |
+| 3    | `enrichr_enrichment.py` (TF)        | Fisher's-exact TF enrichment of the ENCODE_and_ChEA_Consensus library against host genes *positively* correlated with *C. albicans* at `p < 0.05`, per diagnosis. Computed exactly as Enrichr does with a background list: case-insensitive gene symbols, Enrichr's Fisher implementation, odds ratio and combined score, and BH correction over the terms with ≥1 overlapping gene (only those terms are reported). |
+| 4    | `enrichr_enrichment.py` (GO BP/MF/CC)| Same, for the three 2026 GO namespaces, on *negatively* correlated genes. |
+| 4b   | `run_figure5_enrichments.sh`        | HD only, same test, threshold and background: GO_Biological_Process_2026 on *positively* correlated genes (Fig. 5C), Reactome_2022 and PhenGenI_Association_2021 on *negatively* correlated genes (Fig. 5E, 5F). Tables `Results/HD/Tables/enrichr_{GO_BP_positive,Reactome_negative,PhenGenI_negative}_pm4_weeks.tsv` (all terms with ≥1 overlapping gene, as Enrichr reports them); top-10 bar plots by BH-adjusted *p* (`plot_figure5_enrichment_panels.py`) as `Results/HD/Figures/Fig5{C,E,F}_*_pm4_weeks.{png,pdf}`. |
 | 5    | `btnl_analysis.py`                  | Direct Pearson regression of BTNL3 and BTNL8 vs. *C. albicans* CLR; scatter plots plus a week-window sensitivity sweep. Outputs under `Results/BTNL/`. |
 | 6    | `hnf4a_week_sensitivity.py`         | HNF4A ENCODE enrichment *p*-value and BH-adjusted *p*-value as a function of the temporal matching window (±1 to ±52 weeks), for HD / CD / UC. Confirms the HNF4A signal is not an artefact of the default ±4-week window. |
 | 7    | `hnf4a_btnl_fungal_ranking.py`      | Combined HNF4A + BTNL3 + BTNL8 score over **13 curated human-associated fungi**, both uncapped and capped at `p = 1e-10`. Bar plots + TSVs under `Results-HNF4A-fungi/`. |
